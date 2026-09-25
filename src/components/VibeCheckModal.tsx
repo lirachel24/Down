@@ -30,7 +30,7 @@ export const VibeCheckModal: React.FC<VibeCheckModalProps> = ({
         particleCount: 75,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#CCFF00', '#18111A', '#2A6E1E'],
+        colors: ['#CCFF00', '#18111A', '#9B004F'],
       });
     }
 
@@ -46,11 +46,11 @@ export const VibeCheckModal: React.FC<VibeCheckModalProps> = ({
       aria-labelledby="vibe-check-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
     >
-      <div className="bg-white w-full max-w-md rounded-3xl p-6 border border-neutral-200 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-150 relative">
+      <div className="bg-white w-full max-w-md rounded-3xl p-6 border border-line shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-150 relative">
         <button
           onClick={onClose}
           aria-label="Close Vibe Check"
-          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-neutral-100 border border-neutral-200 text-neutral-600 hover:text-black flex items-center justify-center"
+          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-sand border border-line text-neutral-600 hover:text-black flex items-center justify-center"
         >
           <X className="w-4 h-4" />
         </button>
@@ -71,14 +71,14 @@ export const VibeCheckModal: React.FC<VibeCheckModalProps> = ({
               </div>
             </div>
 
-            <div className="p-4 bg-neutral-50 rounded-2xl border border-neutral-200 flex items-center gap-3">
+            <div className="p-4 bg-sand rounded-2xl border border-line flex items-center gap-3">
               <img
                 src={vibeCheck.partnerAvatar}
                 alt={vibeCheck.partnerName}
-                className="w-14 h-14 rounded-full object-cover border-2 border-neutral-200"
+                className="w-14 h-14 rounded-full object-cover border-2 border-line"
               />
               <div className="flex-1 min-w-0">
-                <span className="text-[10px] font-bold text-[#2A6E1E] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-[#9B004F] uppercase tracking-wider">
                   Recent Hangout
                 </span>
                 <h4 className="font-headline text-base font-bold text-[#18111A]">
@@ -100,7 +100,7 @@ export const VibeCheckModal: React.FC<VibeCheckModalProps> = ({
             <div className="grid grid-cols-2 gap-3 mt-1">
               <button
                 onClick={() => handleVote('no')}
-                className="min-h-[48px] py-3 px-4 rounded-2xl bg-neutral-100 border border-neutral-200 text-neutral-700 hover:bg-neutral-200 text-xs font-bold transition-all active:scale-95"
+                className="min-h-[48px] py-3 px-4 rounded-2xl bg-sand border border-line text-neutral-700 hover:bg-neutral-200 text-xs font-bold transition-all active:scale-95"
               >
                 Keep it low-key (No)
               </button>
@@ -115,7 +115,7 @@ export const VibeCheckModal: React.FC<VibeCheckModalProps> = ({
 
             {/* Anti-flake refund note */}
             <div className="p-3 bg-[#CCFF00]/20 rounded-2xl border border-[#CCFF00] flex items-center gap-2.5 text-xs text-[#18111A]">
-              <ShieldCheck className="w-4 h-4 text-[#2A6E1E] shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-[#9B004F] shrink-0" />
               <span>
                 <strong>GPS Verified:</strong> Your $5 attendance deposit has been cleared and unlocked.
               </span>
@@ -134,8 +134,8 @@ export const VibeCheckModal: React.FC<VibeCheckModalProps> = ({
                 <p className="text-xs text-neutral-600 max-w-xs leading-relaxed">
                   Both of you voted Down! We added <strong>+{vibeCheck.hoursSpent} hours</strong> to your 200-Hour Rule tracker with {vibeCheck.partnerName}.
                 </p>
-                <div className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200 text-xs text-left w-full mt-2">
-                  <div className="flex items-center gap-1.5 text-[#2A6E1E] font-bold mb-1">
+                <div className="p-3.5 bg-sand rounded-2xl border border-line text-xs text-left w-full mt-2">
+                  <div className="flex items-center gap-1.5 text-[#9B004F] font-bold mb-1">
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Unlocked: Day 2 Callback</span>
                   </div>
@@ -146,7 +146,7 @@ export const VibeCheckModal: React.FC<VibeCheckModalProps> = ({
               </>
             ) : (
               <>
-                <div className="w-16 h-16 rounded-full bg-neutral-100 border border-neutral-200 text-neutral-500 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-sand border border-line text-neutral-500 flex items-center justify-center">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h3 className="font-header text-xl text-[#18111A]">

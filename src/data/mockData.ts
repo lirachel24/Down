@@ -3,9 +3,9 @@ import { Beacon, FriendOrbit, PendingVibeCheck, UserProfile } from '../types';
 export const currentUser: UserProfile = {
   id: 'user-kylie',
   name: 'Kylie',
-  handle: '@kylie_eecs',
+  handle: '@kylie',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-  bio: 'EECS at UC Berkeley. Fighting the Wednesday 6:30 PM slump one sweet treat and parallel errand run at a time.',
+  bio: 'Part-time adult, full-time snack enthusiast',
   role: 'EECS Student & Creator',
   companyOrSchool: 'UC Berkeley',
   neighborhood: 'Elmwood / Telegraph, Berkeley',
@@ -18,6 +18,8 @@ export const currentUser: UserProfile = {
     'Target and Walgreens maintenance runs'
   ],
   totalHoursLogged: 148,
+  joinedAt: 'June 2026',
+  socials: { instagram: 'kylie', x: 'kylie' },
 };
 
 export const initialBeacons: Beacon[] = [
@@ -59,7 +61,7 @@ export const initialBeacons: Beacon[] = [
       'What silly workplace drama made you roll your eyes today?'
     ],
     depositRequired: true,
-    image: '/src/assets/images/hangout_coffee_spontaneous_1790368811947.jpg',
+    image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'beacon-2',
@@ -99,7 +101,7 @@ export const initialBeacons: Beacon[] = [
       'What chore are you actively avoiding right now?'
     ],
     depositRequired: true,
-    image: '/src/assets/images/hangout_errands_chore_1790368822037.jpg',
+    image: 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'beacon-3',
@@ -144,7 +146,7 @@ export const initialBeacons: Beacon[] = [
       'Who is the drama king/queen of your neighborhood park?'
     ],
     depositRequired: false,
-    image: '/src/assets/images/hangout_park_walk_1790368831575.jpg',
+    image: 'https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'beacon-4',
@@ -184,7 +186,7 @@ export const initialBeacons: Beacon[] = [
       'After this, do we get boba or pastry?'
     ],
     depositRequired: true,
-    image: '/src/assets/images/hangout_coffee_spontaneous_1790368811947.jpg',
+    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
   }
 ];
 
@@ -279,3 +281,38 @@ export const initialPendingVibeCheck: PendingVibeCheck = {
   voted: false,
   depositStatus: 'holding',
 };
+
+export interface UpcomingEvent {
+  id: string;
+  title: string;
+  startsAt: number;
+  image?: string;
+}
+
+const atHour = (daysFromNow: number, hour: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + daysFromNow);
+  d.setHours(hour, 0, 0, 0);
+  return d.getTime();
+};
+
+// Days until the coming Saturday (next weekend = the one after that)
+const daysToSaturday = (6 - new Date().getDay() + 7) % 7 || 7;
+
+export const freeTonightEvents: UpcomingEvent[] = [
+  { id: 'tonight-1', title: 'Rooftop drinks', startsAt: atHour(0, 17), image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80' },
+  { id: 'tonight-2', title: 'Walk around the lake', startsAt: atHour(0, 18), image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80' },
+  { id: 'tonight-3', title: 'Lunch with friends', startsAt: atHour(0, 19), image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=800&q=80' },
+  { id: 'tonight-4', title: 'Wine night', startsAt: atHour(0, 19), image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=800&q=80' },
+  { id: 'tonight-5', title: 'Sunset hang on the hill', startsAt: atHour(0, 20), image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80' },
+  { id: 'tonight-6', title: 'Live music & drinks', startsAt: atHour(0, 21), image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=80' },
+];
+
+export const nextWeekendEvents: UpcomingEvent[] = [
+  { id: 'weekend-1', title: 'Pool party', startsAt: atHour(daysToSaturday + 7, 13), image: 'https://images.unsplash.com/photo-1523301343968-6a6ebf63c672?auto=format&fit=crop&w=800&q=80' },
+  { id: 'weekend-2', title: 'Brunch crawl', startsAt: atHour(daysToSaturday + 8, 11), image: 'https://images.unsplash.com/photo-1528605105345-5344ea20e269?auto=format&fit=crop&w=800&q=80' },
+  { id: 'weekend-3', title: 'Thrift & boba', startsAt: atHour(daysToSaturday + 8, 14), image: 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?auto=format&fit=crop&w=800&q=80' },
+  { id: 'weekend-4', title: 'Birthday party', startsAt: atHour(daysToSaturday + 7, 20), image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=80' },
+  { id: 'weekend-5', title: 'Dinner out', startsAt: atHour(daysToSaturday + 7, 18), image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=800&q=80' },
+  { id: 'weekend-6', title: 'Co-working morning', startsAt: atHour(daysToSaturday + 8, 9), image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80' },
+];

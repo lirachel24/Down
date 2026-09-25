@@ -32,13 +32,13 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
 
   return (
     <article
-      className="bg-white rounded-3xl p-4 border border-neutral-200 shadow-xs hover:shadow-md transition-all flex flex-col gap-3 group"
+      className="bg-white rounded-3xl p-4 border border-line shadow-xs hover:shadow-md transition-all flex flex-col gap-3 group"
       aria-label={`Event: ${beacon.title}`}
     >
       {/* Top Row: Luma-style layout with Poster Image on left & Metadata on right */}
       <div className="flex items-start gap-3.5">
         {/* Poster Image (Luma square rounded format) */}
-        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 bg-neutral-100 border border-neutral-200 shadow-2xs">
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 bg-sand border border-line shadow-2xs">
           <img
             src={beacon.image}
             alt={beacon.title}
@@ -85,11 +85,11 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
           {/* Time & Location rows */}
           <div className="flex flex-col gap-0.5 mt-1.5">
             <div className="flex items-center gap-1.5 text-xs text-neutral-600">
-              <Clock className="w-3.5 h-3.5 text-[#2A6E1E] shrink-0" />
+              <Clock className="w-3.5 h-3.5 text-[#9B004F] shrink-0" />
               <span className="font-medium text-[#18111A]">Happening Now · {beacon.durationMinutes} mins</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-neutral-600">
-              <MapPin className="w-3.5 h-3.5 text-[#2A6E1E] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#9B004F] shrink-0" />
               <span className="truncate">{beacon.locationName}</span>
               <span className="text-[11px] font-semibold text-neutral-400">({beacon.distance})</span>
             </div>
@@ -98,22 +98,22 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
       </div>
 
       {/* Why Go Rationale: Clean inline callout */}
-      <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-200 flex flex-col gap-1.5">
+      <div className="bg-sand rounded-2xl p-3 border border-line flex flex-col gap-1.5">
         <div className="flex items-start gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-[#2A6E1E] shrink-0 mt-0.5" />
+          <Sparkles className="w-3.5 h-3.5 text-[#9B004F] shrink-0 mt-0.5" />
           <p className="text-xs text-neutral-700 leading-relaxed">
             "{beacon.convinceMeReason}"
           </p>
         </div>
 
-        <div className="flex items-center justify-between pt-1 border-t border-neutral-200 text-[11px]">
+        <div className="flex items-center justify-between pt-1 border-t border-line text-[11px]">
           <div className="flex items-center gap-1.5 text-neutral-600 truncate">
             <Shirt className="w-3 h-3 text-[#18111A]" />
             <span className="truncate">{beacon.whatAreWeWearing}</span>
           </div>
           <button
             onClick={() => onSelectConvinceMe(beacon)}
-            className="text-[11px] font-bold text-[#18111A] hover:text-[#2A6E1E] shrink-0 flex items-center"
+            className="text-[11px] font-bold text-[#18111A] hover:text-[#9B004F] shrink-0 flex items-center"
           >
             <span>Plan & tips</span>
             <ChevronRight className="w-3 h-3" />
@@ -124,7 +124,7 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
       {/* Action Footer */}
       <div className="flex items-center gap-2 pt-0.5">
         {isJoined ? (
-          <div className="min-h-[44px] flex-1 px-4 py-2.5 text-xs font-bold rounded-2xl bg-[#2A6E1E] text-white flex items-center justify-center gap-1.5 shadow-xs">
+          <div className="min-h-[44px] flex-1 px-4 py-2.5 text-xs font-bold rounded-2xl bg-[#9B004F] text-white flex items-center justify-center gap-1.5 shadow-xs">
             <Check className="w-4 h-4 stroke-[2.5]" />
             <span>You're Down! Spot Claimed</span>
           </div>

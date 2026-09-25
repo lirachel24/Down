@@ -31,7 +31,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
         particleCount: 60,
         spread: 65,
         origin: { y: 0.6 },
-        colors: ['#CCFF00', '#18111A', '#2A6E1E'],
+        colors: ['#CCFF00', '#18111A', '#9B004F'],
       });
       setTimeout(() => {
         onConfirmSuccess(beacon.id);
@@ -78,7 +78,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
               className="w-12 h-12 rounded-xl object-cover shrink-0 border border-black/5"
             />
             <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#2A6E1E] block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9B004F] block">
                 {beacon.categoryLabel}
               </span>
               <h4 className="text-xs font-bold text-black truncate">
@@ -115,12 +115,12 @@ export const DepositModal: React.FC<DepositModalProps> = ({
             {/* Refundable Guarantee Row */}
             <div className="p-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-full bg-[#CCFF00]/30 text-[#2A6E1E] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#CCFF00]/30 text-[#9B004F] flex items-center justify-center">
                   <ShieldCheck className="w-3.5 h-3.5" />
                 </div>
                 <div>
                   <span className="text-xs font-semibold text-black block">Anti-Flake Commitment</span>
-                  <span className="text-[10px] text-[#2A6E1E] font-medium">100% Refunded upon GPS Check-in</span>
+                  <span className="text-[10px] text-[#9B004F] font-medium">100% Refunded upon GPS Check-in</span>
                 </div>
               </div>
               <span className="text-[10px] font-bold text-[#8E8E93] bg-[#F2F2F7] px-2 py-0.5 rounded-full">
@@ -133,7 +133,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
           <div className="bg-white rounded-2xl p-4 shadow-xs border border-black/5 flex items-center justify-between">
             <div>
               <span className="text-xs text-[#8E8E93] block">Hold Deposit Today</span>
-              <span className="text-[11px] text-[#2A6E1E] font-medium">Refunded after arrival</span>
+              <span className="text-[11px] text-[#9B004F] font-medium">Refunded after arrival</span>
             </div>
             <div className="text-right">
               <span className="text-2xl font-bold font-mono text-black tabular-nums tracking-tight">

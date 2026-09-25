@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
@@ -13,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
 // Initialize Gemini client if API key is present
 const apiKey = process.env.GEMINI_API_KEY;
@@ -180,6 +181,113 @@ app.post('/api/gemini/callback', async (req, res) => {
       message: `Still thinking about ${memorySnippet || 'the funny story from our hangout'}! Hope you're having an awesome week.`,
       fallback: true
     });
+  }
+});
+
+
+// ---------- Events (persisted to data/events.json) ----------
+const DATA_DIR = path.join(__dirname, 'data');
+const EVENTS_FILE = path.join(DATA_DIR, 'events.json');
+
+function readEvents(): any[] {
+  try {
+    return JSON.parse(fs.readFileSync(EVENTS_FILE, 'utf8'));
+  } catch {
+    return [];
+  }
+}
+
+function writeEvents(events: any[]) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(EVENTS_FILE, JSON.stringify(events, null, 2));
+}
+
+app.get('/api/events', (_req, res) => {
+  const now = Date.now();
+  res.json({ events: readEvents().filter((e) => e.expiresAt > now) });
+});
+
+app.post('/api/events', (req, res) => {
+  const e = req.body;
+  if (
+    !e ||
+    typeof e.id !== 'string' ||
+    typeof e.title !== 'string' ||
+    !e.title.trim() ||
+    typeof e.startTime !== 'number' ||
+    typeof e.expiresAt !== 'number' ||
+    e.expiresAt <= e.startTime
+  ) {
+    return res.status(400).json({ error: 'Invalid event' });
+  }
+  const events = readEvents().filter((x) => x.id !== e.id);
+  events.unshift(e);
+  writeEvents(events);
+  res.json({ event: e });
+});
+
+// ---------- Location search (OpenStreetMap Nominatim, proxied so we can send a User-Agent) ----------
+const NOMINATIM = 'https://nominatim.openstreetmap.org';
+const nominatimHeaders = { 'User-Agent': 'DownApp/1.0 (spontaneous hangouts prototype)' };
+
+function toPlace(r: any) {
+  const display: string = r.display_name || '';
+  return {
+    name: r.name || display.split(',')[0] || 'Pinned location',
+    address: display,
+    lat: parseFloat(r.lat),
+    lng: parseFloat(r.lon),
+  };
+}
+
+app.get('/api/geocode', async (req, res) => {
+  const q = String(req.query.q || '').trim();
+  if (q.length < 3) return res.json({ places: [] });
+  try {
+    const r = await fetch(`${NOMINATIM}/search?format=jsonv2&limit=6&q=${encodeURIComponent(q)}`, {
+      headers: nominatimHeaders,
+    });
+    const data: any[] = await r.json();
+    res.json({ places: data.map(toPlace) });
+  } catch (err) {
+    console.error('Geocode error:', err);
+    res.status(502).json({ places: [], error: 'Location search unavailable' });
+  }
+});
+
+app.get('/api/reverse', async (req, res) => {
+  const lat = Number(req.query.lat);
+  const lng = Number(req.query.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return res.status(400).json({ error: 'Bad coordinates' });
+  try {
+    const r = await fetch(`${NOMINATIM}/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, { headers: nominatimHeaders });
+    const data: any = await r.json();
+    if (data.error) return res.json({ place: { name: 'Pinned location', address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`, lat, lng } });
+    res.json({ place: { ...toPlace(data), lat, lng } });
+  } catch (err) {
+    console.error('Reverse geocode error:', err);
+    res.json({ place: { name: 'Pinned location', address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`, lat, lng } });
+  }
+});
+
+app.post('/api/gemini/event-description', async (req, res) => {
+  const { title, location, when } = req.body;
+  const fallback = `<p>${title ? `<strong>${String(title).replace(/[<>&]/g, '')}</strong> — ` : ''}no plans needed, you just need to be down.</p><p>Come as you are (sweatpants fully approved) and leave whenever you need to. It's a low-key hang${location ? ` at ${String(location).replace(/[<>&]/g, '')}` : ''}, and you'll head home feeling lighter than when you arrived.</p>`;
+  if (!aiClient) return res.json({ html: fallback, fallback: true });
+  try {
+    const response = await aiClient.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Write a short, warm, funny event description (2 short paragraphs, max 70 words total) for a spontaneous low-pressure hangout on the app "Down".
+Title: "${title || 'Hangout'}"
+Location: "${location || 'nearby'}"
+When: "${when || 'soon'}"
+Tone: relatable, zero pressure, sweatpants are fine. Return ONLY simple HTML using <p> and <strong> tags, no markdown, no code fences.`,
+    });
+    const html = (response.text || '').replace(/```html|```/g, '').trim();
+    res.json({ html: html || fallback, fallback: !html });
+  } catch (err) {
+    console.error('Gemini event-description error:', err);
+    res.json({ html: fallback, fallback: true });
   }
 });
 

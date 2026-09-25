@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --color-pink: #FF4D94;
+  --color-lime: #CCFF00;
+  --color-berry: #9B004F;
+  --color-cream: #FAF6EE;
+  --color-sand: #F0EAE0;
+  --color-line: #E7DFD1;
+  --color-ink: #18111A;
+  --color-muted: #5C4F5A;
+}
+
 @layer base {
   :root {
     --font-header: 'Shrikhand', cursive, sans-serif;
@@ -7,17 +18,15 @@
     --font-headline: 'Bricolage Grotesque', sans-serif;
     --font-label: 'Space Grotesk', sans-serif;
 
-    --color-primary: #CCFF00;
-    --color-secondary: #18111A;
-    --color-tertiary: #2A6E1E;
-    --color-neutral: #FFFFFF;
-    --color-ink: #18111A;
-    --color-muted: #5C4F5A;
+    --color-primary: #FF4D94;
+    --color-secondary: #CCFF00;
+    --color-tertiary: #9B004F;
+    --color-neutral: #FAF6EE;
   }
 
   body {
     font-family: var(--font-body);
-    background-color: #FFFFFF;
+    background-color: #FAF6EE;
     color: var(--color-ink);
     -webkit-tap-highlight-color: transparent;
   }
@@ -38,7 +47,7 @@
 
 /* Accessible focus rings */
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
-  outline: 2px solid #CCFF00;
+  outline: 2px solid rgba(255, 77, 148, 0.4);
   outline-offset: 2px;
 }
 
@@ -51,3 +60,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   scrollbar-width: none;
 }
 
+
+/* Rich text (Tiptap editor + rendered event descriptions) */
+.tiptap h1, .rich-text h1 { font-family: var(--font-headline); font-size: 1.6rem; font-weight: 800; line-height: 1.2; margin: 0.6em 0 0.3em; }
+.tiptap h2, .rich-text h2 { font-family: var(--font-headline); font-size: 1.3rem; font-weight: 700; line-height: 1.25; margin: 0.6em 0 0.3em; }
+.tiptap p, .rich-text p { margin: 0 0 0.75em; }
+.tiptap ul, .rich-text ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.75em; }
+.tiptap ol, .rich-text ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.75em; }
+.tiptap blockquote, .rich-text blockquote { border-left: 3px solid #FF4D94; padding-left: 0.9em; margin: 0 0 0.75em; color: #5C4F5A; }
+.tiptap a, .rich-text a { color: #9B004F; text-decoration: underline; text-underline-offset: 3px; }
+.tiptap > :first-child, .rich-text > :first-child { margin-top: 0; }
+
+/* Leaflet sits under our sticky UI */
+.leaflet-container { font-family: var(--font-body); background: #F0EAE0; }

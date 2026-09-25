@@ -22,6 +22,8 @@ export interface UserProfile {
   sweatpantsApproved: boolean; // "Can see you in sweatpants with zero makeup"
   favoriteChores: string[];
   totalHoursLogged: number;
+  joinedAt: string; // e.g. "June 2026"
+  socials?: { instagram?: string; x?: string };
 }
 
 export interface Beacon {
@@ -59,6 +61,16 @@ export interface Beacon {
   image: string;
   isHost?: boolean;
   joined?: boolean;
+  // Set on events created through the Create Event flow
+  description?: string; // sanitized-on-render HTML from the rich text editor
+  lat?: number;
+  lng?: number;
+  locationInstructions?: string;
+  exactLocationApprovedOnly?: boolean;
+  requireApproval?: boolean;
+  priceCents?: number;
+  visibility?: 'public' | 'friends' | 'private';
+  capacity?: number | null; // null = unlimited
 }
 
 export interface FriendOrbit {

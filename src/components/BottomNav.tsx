@@ -1,93 +1,51 @@
 import React from 'react';
-import { Radio, MapPin, User } from 'lucide-react';
+import { Compass, Users, Plus } from 'lucide-react';
 
-export type TabType = 'feed' | 'map' | 'profile';
+export type TabType = 'feed' | 'friends' | 'profile';
 
 interface BottomNavProps {
   currentTab: TabType;
   onChangeTab: (tab: TabType) => void;
-  onOpenCreateEvent?: () => void;
-  beaconCount: number;
+  onOpenCreateEvent: () => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({
-  currentTab,
-  onChangeTab,
-  beaconCount,
-}) => {
-  return (
-    <div className="fixed bottom-4 left-0 right-0 z-40 flex justify-center px-4 pointer-events-none">
-      {/* Floating rounded pill dock */}
-      <nav
-        aria-label="Primary Navigation"
-        className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-neutral-200 shadow-xl rounded-full px-2 py-1.5 flex items-center gap-1.5 max-w-[260px] w-full justify-between"
+const tabClass = (active: boolean) =>
+  `flex-1 min-h-[52px] py-1.5 px-3 rounded-full flex flex-col items-center justify-center transition-all ${
+    active ? 'bg-ink text-pink font-bold shadow-xs' : 'text-neutral-500 hover:text-ink'
+  }`;
+
+export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChangeTab, onOpenCreateEvent }) => (
+  <div className="fixed bottom-4 left-0 right-0 z-40 flex justify-center px-4 pointer-events-none">
+    <nav
+      aria-label="Primary Navigation"
+      className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-line shadow-xl rounded-full px-2 py-1.5 flex items-center gap-1.5 max-w-[300px] w-full justify-between"
+    >
+      <button
+        onClick={() => onChangeTab('feed')}
+        aria-current={currentTab === 'feed' ? 'page' : undefined}
+        className={tabClass(currentTab === 'feed')}
       >
-        {/* Tab 1: Events */}
-        <button
-          onClick={() => onChangeTab('feed')}
-          aria-current={currentTab === 'feed' ? 'page' : undefined}
-          className={`flex-1 py-1.5 px-3 rounded-full flex flex-col items-center justify-center transition-all ${
-            currentTab === 'feed'
-              ? 'bg-[#18111A] text-[#CCFF00] font-bold shadow-xs'
-              : 'text-neutral-500 hover:text-[#18111A]'
-          }`}
-        >
-          <div className="relative">
-            <Radio
-              className={`w-4 h-4 ${
-                currentTab === 'feed' ? 'scale-110 stroke-[2.5] text-[#CCFF00]' : 'stroke-[1.8]'
-              }`}
-            />
-            {beaconCount > 0 && (
-              <span
-                className={`absolute -top-1 -right-2 text-[9px] font-extrabold w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-xs ${
-                  currentTab === 'feed' ? 'bg-[#CCFF00] text-[#18111A]' : 'bg-[#18111A] text-[#CCFF00]'
-                }`}
-                aria-label={`${beaconCount} active events`}
-              >
-                {beaconCount}
-              </span>
-            )}
-          </div>
-          <span className="text-[10px] tracking-tight mt-0.5 font-semibold">Events</span>
-        </button>
+        <Compass className={`w-4 h-4 ${currentTab === 'feed' ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+        <span className="text-[10px] tracking-tight mt-0.5 font-semibold">Discover</span>
+      </button>
 
-        {/* Tab 2: Live Map */}
-        <button
-          onClick={() => onChangeTab('map')}
-          aria-current={currentTab === 'map' ? 'page' : undefined}
-          className={`flex-1 py-1.5 px-3 rounded-full flex flex-col items-center justify-center transition-all ${
-            currentTab === 'map'
-              ? 'bg-[#18111A] text-[#CCFF00] font-bold shadow-xs'
-              : 'text-neutral-500 hover:text-[#18111A]'
-          }`}
-        >
-          <MapPin
-            className={`w-4 h-4 ${
-              currentTab === 'map' ? 'scale-110 stroke-[2.5] text-[#CCFF00]' : 'stroke-[1.8]'
-            }`}
-          />
-          <span className="text-[10px] tracking-tight mt-0.5 font-semibold">Map</span>
-        </button>
+      {/* Center: Create Event */}
+      <button
+        onClick={onOpenCreateEvent}
+        aria-label="Create Event"
+        className="-my-3 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-pink text-white shadow-[0_8px_20px_-6px_rgba(255,77,148,0.8)] ring-4 ring-cream active:scale-95 transition-transform"
+      >
+        <Plus className="h-7 w-7 stroke-[2.5]" />
+      </button>
 
-        {/* Tab 3: Profile & 200h Orbit */}
-        <button
-          onClick={() => onChangeTab('profile')}
-          aria-current={currentTab === 'profile' ? 'page' : undefined}
-          className={`flex-1 py-1.5 px-3 rounded-full flex flex-col items-center justify-center transition-all ${
-            currentTab === 'profile'
-              ? 'bg-[#18111A] text-[#CCFF00] font-bold shadow-xs'
-              : 'text-neutral-500 hover:text-[#18111A]'
-          }`}
-        >
-          <User
-            className={`w-4 h-4 ${
-              currentTab === 'profile' ? 'scale-110 stroke-[2.5] text-[#CCFF00]' : 'stroke-[1.8]'
-            }`}
-          />
-          <span className="text-[10px] tracking-tight mt-0.5 font-semibold">Profile</span>
-        </button>
-      </nav>
-    </div>
-  );
-};
+      <button
+        onClick={() => onChangeTab('friends')}
+        aria-current={currentTab === 'friends' ? 'page' : undefined}
+        className={tabClass(currentTab === 'friends')}
+      >
+        <Users className={`w-4 h-4 ${currentTab === 'friends' ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+        <span className="text-[10px] tracking-tight mt-0.5 font-semibold">Friends</span>
+      </button>
+    </nav>
+  </div>
+);

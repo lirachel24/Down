@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Beacon } from '../types';
 import { X, Sparkles, Shirt, Clock, ShieldCheck, Check, Brain, Loader2 } from 'lucide-react';
+import { formatPrice, formatWhen, safeHtml } from '../lib/format';
 
 interface ConvinceMeModalProps {
   beacon: Beacon | null;
@@ -56,12 +57,12 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
       aria-labelledby="convince-me-title"
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
     >
-      <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-neutral-200 shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col animate-in slide-in-from-bottom duration-200">
+      <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-line shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col animate-in slide-in-from-bottom duration-200">
         {/* Grab Handle for mobile */}
         <div className="w-12 h-1.5 bg-neutral-300 rounded-full mx-auto my-3 sm:hidden" />
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-neutral-200">
+        <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-line">
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-xl bg-[#CCFF00] text-[#18111A]">
               <Sparkles className="w-5 h-5" />
@@ -78,7 +79,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close event details sheet"
-            className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 text-neutral-600 hover:text-[#18111A] flex items-center justify-center active:scale-95 transition-all"
+            className="w-8 h-8 rounded-full bg-sand border border-line text-neutral-600 hover:text-[#18111A] flex items-center justify-center active:scale-95 transition-all"
           >
             <X className="w-4 h-4 stroke-[2.5]" />
           </button>
@@ -91,7 +92,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
             className={`min-h-[40px] flex-1 py-1.5 text-xs font-bold rounded-xl transition-colors ${
               activeTab === 'why'
                 ? 'bg-[#18111A] text-[#CCFF00] shadow-xs'
-                : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+                : 'bg-white text-neutral-600 border border-line hover:bg-sand'
             }`}
           >
             Why You Should Go
@@ -101,7 +102,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
             className={`min-h-[40px] flex-1 py-1.5 text-xs font-bold rounded-xl transition-colors ${
               activeTab === 'icebreakers'
                 ? 'bg-[#18111A] text-[#CCFF00] shadow-xs'
-                : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+                : 'bg-white text-neutral-600 border border-line hover:bg-sand'
             }`}
           >
             Icebreaker Topics
@@ -111,7 +112,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
             className={`min-h-[40px] flex-1 py-1.5 text-xs font-bold rounded-xl transition-colors ${
               activeTab === 'science'
                 ? 'bg-[#18111A] text-[#CCFF00] shadow-xs'
-                : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+                : 'bg-white text-neutral-600 border border-line hover:bg-sand'
             }`}
           >
             The Science
@@ -123,7 +124,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
           {activeTab === 'why' && (
             <>
               {/* Event Quick Summary */}
-              <div className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200">
+              <div className="p-3.5 bg-sand rounded-2xl border border-line">
                 <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
                   Target Hangout
                 </span>
@@ -135,11 +136,45 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
                 </p>
               </div>
 
+              {/* Host-provided details (events made with Create Event) */}
+              {(beacon.description || beacon.priceCents !== undefined) && (
+                <div className="p-4 bg-white rounded-2xl border border-line shadow-2xs flex flex-col gap-2.5">
+                  <div className="flex flex-wrap gap-1.5 text-[11px] font-bold">
+                    <span className="px-2.5 py-1 rounded-full bg-sand text-[#18111A]">{formatWhen(beacon.startTime)}</span>
+                    {beacon.priceCents !== undefined && (
+                      <span className="px-2.5 py-1 rounded-full bg-sand text-[#18111A]">{formatPrice(beacon.priceCents)}</span>
+                    )}
+                    {beacon.requireApproval && (
+                      <span className="px-2.5 py-1 rounded-full bg-sand text-[#18111A]">Host approval required</span>
+                    )}
+                    {beacon.capacity != null && (
+                      <span className="px-2.5 py-1 rounded-full bg-sand text-[#18111A]">Up to {beacon.capacity} people</span>
+                    )}
+                  </div>
+                  {beacon.address && (
+                    <p className="text-xs text-neutral-600">
+                      {beacon.exactLocationApprovedOnly && !beacon.isHost && !beacon.joined
+                        ? 'Exact location is shared with approved guests.'
+                        : beacon.address}
+                      {beacon.locationInstructions &&
+                        (!beacon.exactLocationApprovedOnly || beacon.isHost || beacon.joined) &&
+                        ` · ${beacon.locationInstructions}`}
+                    </p>
+                  )}
+                  {beacon.description && (
+                    <div
+                      className="rich-text text-sm text-[#18111A] leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: safeHtml(beacon.description) }}
+                    />
+                  )}
+                </div>
+              )}
+
               {/* Nudge: Departure math */}
               <div className="p-3.5 rounded-2xl bg-[#CCFF00]/20 border border-[#CCFF00] text-[#18111A]">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#2A6E1E]" />
-                  <span className="text-xs font-bold text-[#2A6E1E] uppercase tracking-wider">
+                  <Clock className="w-4 h-4 text-[#9B004F]" />
+                  <span className="text-xs font-bold text-[#9B004F] uppercase tracking-wider">
                     Departure Nudge
                   </span>
                 </div>
@@ -152,7 +187,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
               </div>
 
               {/* "What are we wearing?" Barrier Remover */}
-              <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-2xs">
+              <div className="p-4 bg-white rounded-2xl border border-line shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Shirt className="w-4 h-4 text-[#18111A]" />
@@ -175,10 +210,10 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
               </div>
 
               {/* Gemini AI Anti-Lazy Pep Talk */}
-              <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-2xs">
+              <div className="p-4 bg-white rounded-2xl border border-line shadow-2xs">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">
-                    <Brain className="w-4 h-4 text-[#2A6E1E]" />
+                    <Brain className="w-4 h-4 text-[#9B004F]" />
                     <span className="text-xs font-bold text-[#18111A]">
                       Gemini Voice of Reason
                     </span>
@@ -216,7 +251,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
               {beacon.icebreakerQuestions.map((q, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200 flex items-start gap-2.5"
+                  className="p-3.5 bg-sand rounded-2xl border border-line flex items-start gap-2.5"
                 >
                   <span className="w-6 h-6 rounded-full bg-[#CCFF00] text-[#18111A] text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">
                     {idx + 1}
@@ -231,7 +266,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
 
           {activeTab === 'science' && (
             <div className="flex flex-col gap-3">
-              <div className="p-4 bg-neutral-50 rounded-2xl border border-neutral-200">
+              <div className="p-4 bg-sand rounded-2xl border border-line">
                 <h4 className="font-headline text-sm font-bold text-[#18111A]">
                   The "Wednesday 6:30 PM" Activation Cliff
                 </h4>
@@ -243,7 +278,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
                 </p>
               </div>
 
-              <div className="p-4 bg-neutral-50 rounded-2xl border border-neutral-200">
+              <div className="p-4 bg-sand rounded-2xl border border-line">
                 <h4 className="font-headline text-sm font-bold text-[#18111A]">
                   The 200-Hour Rule (Prof. Jeffrey Hall)
                 </h4>
@@ -258,9 +293,9 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
           )}
 
           {/* Anti-Flake Deposit Info */}
-          <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 flex items-center justify-between text-xs text-neutral-600">
+          <div className="p-3 bg-sand rounded-xl border border-line flex items-center justify-between text-xs text-neutral-600">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#2A6E1E]" />
+              <ShieldCheck className="w-4 h-4 text-[#9B004F]" />
               <span>$5 Anti-Flake Commitment Deposit</span>
             </div>
             <span className="font-bold text-[#18111A] bg-[#CCFF00] px-2 py-0.5 rounded">
@@ -272,7 +307,7 @@ export const ConvinceMeModal: React.FC<ConvinceMeModalProps> = ({
           {isAlreadyJoined ? (
             <button
               disabled
-              className="min-h-[48px] w-full py-3.5 px-4 rounded-2xl bg-[#2A6E1E] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm"
+              className="min-h-[48px] w-full py-3.5 px-4 rounded-2xl bg-[#9B004F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm"
             >
               <Check className="w-4 h-4" />
               <span>You're Down! Spot Reserved</span>

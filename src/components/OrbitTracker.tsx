@@ -79,7 +79,7 @@ export const OrbitTracker: React.FC<OrbitTrackerProps> = ({
       particleCount: 40,
       spread: 60,
       origin: { y: 0.7 },
-      colors: ['#CCFF00', '#18111A', '#2A6E1E'],
+      colors: ['#CCFF00', '#18111A', '#9B004F'],
     });
   };
 
@@ -88,7 +88,7 @@ export const OrbitTracker: React.FC<OrbitTrackerProps> = ({
       {/* 200-Hour Rule Research Banner */}
       <div className="bg-white text-[#18111A] rounded-3xl p-5 shadow-xs border border-[#E7DFD1] relative overflow-hidden">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#2A6E1E] bg-[#CCFF00]/40 px-2 py-0.5 rounded-full">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#9B004F] bg-[#CCFF00]/40 px-2 py-0.5 rounded-full">
             The 200-Hour Rule
           </span>
           <span className="text-[11px] bg-[#FAF6EE] px-2 py-0.5 rounded-full text-[#5C4F5A] border border-[#E7DFD1]">
@@ -109,7 +109,7 @@ export const OrbitTracker: React.FC<OrbitTrackerProps> = ({
           <div>
             <span className="text-xs text-[#7A6E7B]">Total Community Hours</span>
             <div className="text-2xl font-bold font-mono text-[#18111A] tabular-nums">
-              <span className="text-[#2A6E1E] bg-[#CCFF00]/50 px-1.5 py-0.5 rounded-md mr-1">{totalLoggedAll.toFixed(1)}</span> hrs
+              <span className="text-[#9B004F] bg-[#CCFF00]/50 px-1.5 py-0.5 rounded-md mr-1">{totalLoggedAll.toFixed(1)}</span> hrs
             </div>
           </div>
           <div className="text-right">
@@ -237,7 +237,7 @@ export const OrbitTracker: React.FC<OrbitTrackerProps> = ({
                     <h4 className="font-headline text-base font-bold text-[#18111A]">
                       {friend.name}
                     </h4>
-                    <span className="text-[11px] font-bold text-[#2A6E1E] bg-[#CCFF00]/40 px-2 py-0.5 rounded-full inline-block mt-0.5">
+                    <span className="text-[11px] font-bold text-[#9B004F] bg-[#CCFF00]/40 px-2 py-0.5 rounded-full inline-block mt-0.5">
                       {friend.tierLabel}
                     </span>
                     <p className="text-[11px] text-[#5C4F5A] mt-0.5">{friend.metAt}</p>
@@ -294,7 +294,7 @@ export const OrbitTracker: React.FC<OrbitTrackerProps> = ({
                   onClick={() => handleGenerateCallback(friend, 'day7-chore')}
                   className="min-h-[40px] flex-1 px-2.5 py-1.5 text-[11px] font-bold rounded-xl bg-white border border-[#E7DFD1] text-[#18111A] hover:bg-[#FAF6EE] flex items-center justify-center gap-1"
                 >
-                  <Clock className="w-3 h-3 text-[#2A6E1E]" />
+                  <Clock className="w-3 h-3 text-[#9B004F]" />
                   <span>Day 7: Chore</span>
                 </button>
                 <button
@@ -375,7 +375,7 @@ export const OrbitTracker: React.FC<OrbitTrackerProps> = ({
           <div className="bg-white w-full max-w-md rounded-3xl p-5 border border-[#E7DFD1] shadow-2xl flex flex-col gap-4 animate-in fade-in duration-150">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#2A6E1E]" />
+                <Sparkles className="w-5 h-5 text-[#9B004F]" />
                 <h3 className="font-header text-lg text-[#18111A]">
                   Low-Friction Nudge
                 </h3>
