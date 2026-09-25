@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-header: 'Shrikhand', cursive, sans-serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-headline: 'Bricolage Grotesque', sans-serif;
+    --font-label: 'Space Grotesk', sans-serif;
+
+    --color-primary: #CCFF00;
+    --color-secondary: #18111A;
+    --color-tertiary: #2A6E1E;
+    --color-neutral: #FFFFFF;
+    --color-ink: #18111A;
+    --color-muted: #5C4F5A;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: #FFFFFF;
+    color: var(--color-ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, .font-header {
+    font-family: var(--font-header);
+    letter-spacing: -0.01em;
+  }
+
+  .font-headline {
+    font-family: var(--font-headline);
+  }
+
+  .font-label {
+    font-family: var(--font-label);
+  }
+}
+
+/* Accessible focus rings */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid #CCFF00;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar for horizontal chip bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
