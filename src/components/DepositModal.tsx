@@ -48,7 +48,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4 select-none animate-in fade-in duration-200"
     >
       {/* Container simulating high-fidelity iOS Apple Pay / Payment Sheet */}
-      <div className="bg-[#F2F2F7] w-full max-w-sm rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col border border-black/10 animate-in slide-in-from-bottom duration-200">
+      <div className="bg-[#F2F2F7] w-full max-w-sm rounded-t-sheet sm:rounded-sheet shadow-2xl overflow-hidden flex flex-col border border-black/10 animate-in slide-in-from-bottom duration-200">
         
         {/* iOS Grab bar */}
         <div className="w-10 h-1 bg-[#C7C7CC] rounded-full mx-auto my-2.5 sm:hidden" />
@@ -71,11 +71,11 @@ export const DepositModal: React.FC<DepositModalProps> = ({
         <div className="px-4 pb-6 flex flex-col gap-3">
           
           {/* Hangout Summary Item Box */}
-          <div className="bg-white rounded-2xl p-3.5 shadow-xs border border-black/5 flex items-center gap-3">
+          <div className="bg-white rounded-control p-3.5 shadow-xs border border-black/5 flex items-center gap-3">
             <img
               src={beacon.image}
               alt={beacon.title}
-              className="w-12 h-12 rounded-xl object-cover shrink-0 border border-black/5"
+              className="w-12 h-12 rounded-control object-cover shrink-0 border border-black/5"
             />
             <div className="flex-1 min-w-0">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#9B004F] block">
@@ -91,14 +91,14 @@ export const DepositModal: React.FC<DepositModalProps> = ({
           </div>
 
           {/* Payment Card / Method Selection */}
-          <div className="bg-white rounded-2xl shadow-xs border border-black/5 divide-y divide-black/5 overflow-hidden">
+          <div className="bg-white rounded-control shadow-xs border border-black/5 divide-y divide-black/5 overflow-hidden">
             <div
               onClick={() => setSelectedMethod('apple-pay')}
               className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-black/[0.02]"
             >
               <div className="flex items-center gap-3">
                 {/* Styled Payment Card Graphic */}
-                <div className="w-10 h-6 rounded-md bg-gradient-to-r from-neutral-900 to-black p-1 flex items-center justify-center text-[#CCFF00] text-[9px] font-bold shadow-xs border border-neutral-700">
+                <div className="w-10 h-6 rounded-control bg-gradient-to-r from-neutral-900 to-black p-1 flex items-center justify-center text-cream text-[9px] font-bold shadow-xs border border-neutral-700">
                   VISA
                 </div>
                 <div>
@@ -115,7 +115,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
             {/* Refundable Guarantee Row */}
             <div className="p-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-full bg-[#CCFF00]/30 text-[#9B004F] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-sand text-berry flex items-center justify-center">
                   <ShieldCheck className="w-3.5 h-3.5" />
                 </div>
                 <div>
@@ -130,7 +130,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
           </div>
 
           {/* Total Due Section */}
-          <div className="bg-white rounded-2xl p-4 shadow-xs border border-black/5 flex items-center justify-between">
+          <div className="bg-white rounded-card p-4 shadow-xs border border-black/5 flex items-center justify-between">
             <div>
               <span className="text-xs text-[#8E8E93] block">Hold Deposit Today</span>
               <span className="text-[11px] text-[#9B004F] font-medium">Refunded after arrival</span>
@@ -145,23 +145,23 @@ export const DepositModal: React.FC<DepositModalProps> = ({
           {/* Side Button / Double Click Prompt & Interactive Trigger */}
           <div className="mt-2 flex flex-col items-center gap-2 text-center">
             {isConfirmed ? (
-              <div className="w-full py-4 rounded-2xl bg-[#34C759] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md animate-in zoom-in-95">
+              <div className="w-full py-4 rounded-control bg-[#34C759] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md animate-in zoom-in-95">
                 <Check className="w-5 h-5 stroke-[3]" />
                 <span>Deposit Authorized! You're Down</span>
               </div>
             ) : isProcessing ? (
-              <div className="w-full py-4 rounded-2xl bg-black text-white font-medium text-xs flex items-center justify-center gap-2">
+              <div className="w-full py-4 rounded-control bg-cta text-cream font-medium text-xs flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <span>Contacting Card Issuer...</span>
               </div>
             ) : (
               <button
                 onClick={handlePay}
-                className="w-full py-3.5 px-4 rounded-2xl bg-black text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-neutral-800 active:scale-[0.98] transition-all shadow-md focus-visible:ring-2 focus-visible:ring-black"
+                className="w-full py-3.5 px-4 rounded-control bg-cta text-cream font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-md focus-visible:ring-2 focus-visible:ring-black"
               >
                 {/* FaceID / Touch prompt icon */}
                 <div className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center">
-                  <Smartphone className="w-3 h-3 text-[#CCFF00]" />
+                  <Smartphone className="w-3 h-3 text-cream" />
                 </div>
                 <span>Pay $5.00 with Pay</span>
               </button>

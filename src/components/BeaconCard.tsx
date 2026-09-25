@@ -32,13 +32,13 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
 
   return (
     <article
-      className="bg-white rounded-3xl p-4 border border-line shadow-xs hover:shadow-md transition-all flex flex-col gap-3 group"
+      className="bg-white rounded-card p-4 border border-line shadow-xs hover:shadow-md transition-all flex flex-col gap-3 group"
       aria-label={`Event: ${beacon.title}`}
     >
       {/* Top Row: Luma-style layout with Poster Image on left & Metadata on right */}
       <div className="flex items-start gap-3.5">
         {/* Poster Image (Luma square rounded format) */}
-        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 bg-sand border border-line shadow-2xs">
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-control overflow-hidden shrink-0 bg-sand border border-line shadow-2xs">
           <img
             src={beacon.image}
             alt={beacon.title}
@@ -47,9 +47,9 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
           {/* Status badge overlaid on poster corner */}
           <div className="absolute top-1.5 left-1.5">
             <span
-              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-md shadow-xs ${
+              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-control shadow-xs ${
                 isExpiringSoon
-                  ? 'bg-[#CCFF00] text-[#18111A] font-extrabold border border-black/10'
+                  ? 'bg-sand text-ink font-extrabold border border-black/10'
                   : 'bg-[#18111A]/85 text-white backdrop-blur-xs'
               }`}
             >
@@ -72,7 +72,7 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
               <span>·</span>
               <span className="truncate">{beacon.categoryLabel}</span>
             </div>
-            <span className="text-[10px] font-bold text-[#18111A] bg-[#CCFF00] px-2 py-0.5 rounded-full shrink-0">
+            <span className="text-[10px] font-bold text-ink bg-sand px-2 py-0.5 rounded-full shrink-0">
               {spotsRemaining > 0 ? `${spotsRemaining} open` : 'Full'}
             </span>
           </div>
@@ -98,7 +98,7 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
       </div>
 
       {/* Why Go Rationale: Clean inline callout */}
-      <div className="bg-sand rounded-2xl p-3 border border-line flex flex-col gap-1.5">
+      <div className="bg-sand rounded-control p-3 border border-line flex flex-col gap-1.5">
         <div className="flex items-start gap-2">
           <Sparkles className="w-3.5 h-3.5 text-[#9B004F] shrink-0 mt-0.5" />
           <p className="text-xs text-neutral-700 leading-relaxed">
@@ -124,7 +124,7 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
       {/* Action Footer */}
       <div className="flex items-center gap-2 pt-0.5">
         {isJoined ? (
-          <div className="min-h-[44px] flex-1 px-4 py-2.5 text-xs font-bold rounded-2xl bg-[#9B004F] text-white flex items-center justify-center gap-1.5 shadow-xs">
+          <div className="min-h-[44px] flex-1 px-4 py-2.5 text-xs font-bold rounded-control bg-[#9B004F] text-white flex items-center justify-center gap-1.5 shadow-xs">
             <Check className="w-4 h-4 stroke-[2.5]" />
             <span>You're Down! Spot Claimed</span>
           </div>
@@ -132,10 +132,10 @@ export const BeaconCard: React.FC<BeaconCardProps> = ({
           <button
             onClick={() => onJoinDirect(beacon.id)}
             disabled={isFull}
-            className={`min-h-[44px] flex-1 px-4 py-2.5 text-xs font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xs transition-transform active:scale-[0.98] ${
+            className={`min-h-[44px] flex-1 px-4 py-2.5 text-xs font-bold rounded-control flex items-center justify-center gap-2 shadow-xs transition-transform active:scale-[0.98] ${
               isFull
                 ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
-                : 'bg-[#18111A] hover:bg-neutral-800 text-[#CCFF00]'
+                : 'bg-cta hover:opacity-90 text-cream'
             }`}
           >
             <span>I'm Down</span>

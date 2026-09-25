@@ -87,7 +87,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ place, onSave, onBac
         title="Location"
         onBack={onBack}
         right={
-          <CircleButton label="Save location" variant="ink" onClick={() => onSave(current)} disabled={!current}>
+          <CircleButton label="Save location" variant="lime" onClick={() => onSave(current)} disabled={!current}>
             <Check className="h-5 w-5 stroke-[2.5]" />
           </CircleButton>
         }
@@ -117,7 +117,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ place, onSave, onBac
           disabled={locating}
           className="mt-3 flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/70 px-4 text-sm font-semibold text-ink active:scale-95"
         >
-          {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crosshair className="h-4 w-4 text-pink" />}
+          {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crosshair className="h-4 w-4 text-cta" />}
           Use my current location
         </button>
 
@@ -131,7 +131,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ place, onSave, onBac
                   {i > 0 && <Divider />}
                   <li>
                     <button type="button" onClick={() => choose(r)} className="flex min-h-[56px] w-full items-center gap-4 px-5 py-3 text-left">
-                      <MapPin className="h-5 w-5 shrink-0 text-pink" />
+                      <MapPin className="h-5 w-5 shrink-0 text-cta" />
                       <span className="min-w-0">
                         <span className="block truncate text-base text-ink">{r.name}</span>
                         <span className="block truncate text-sm text-muted">{r.address}</span>
@@ -166,7 +166,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ place, onSave, onBac
           <div className="mt-4 flex flex-col gap-3">
             <Card>
               <div className="flex min-h-[64px] items-center gap-4 px-5 py-3">
-                <MapPin className="h-5 w-5 shrink-0 text-pink" />
+                <MapPin className="h-5 w-5 shrink-0 text-cta" />
                 <div className="min-w-0">
                   <p className="truncate text-lg text-ink">{current.name}</p>
                   <p className="text-sm text-muted">{current.address}</p>
@@ -187,7 +187,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ place, onSave, onBac
             </Card>
 
             {Number.isFinite(current.lat) && Number.isFinite(current.lng) ? (
-              <div className="overflow-hidden rounded-3xl border border-line">
+              <div className="overflow-hidden rounded-card border border-line">
                 <LocationMap lat={current.lat} lng={current.lng} onPick={moveMarker} className="h-56 w-full" />
                 <p className="bg-white/70 px-4 py-2 text-xs text-muted">Tap the map to move the pin.</p>
               </div>

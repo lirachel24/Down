@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  /* Button / nav pink: off-white (#FAF6EE) text on it is 4.7:1, which passes WCAG AA. Bright pink stays for big type and decoration. */
+  --color-cta: #D1216B;
   --color-pink: #FF4D94;
   --color-lime: #CCFF00;
   --color-berry: #9B004F;
@@ -9,10 +11,16 @@
   --color-line: #E7DFD1;
   --color-ink: #18111A;
   --color-muted: #5C4F5A;
+
+  /* Corner radii. Buttons are pills (rounded-full). Nested shapes should be smaller than their container. */
+  --radius-control: 12px; /* inputs, chips, thumbnails, small tiles */
+  --radius-card: 20px; /* cards and grouped lists */
+  --radius-sheet: 28px; /* sheets, dialogs and large panels */
 }
 
 @layer base {
   :root {
+    color-scheme: light;
     --font-header: 'Shrikhand', cursive, sans-serif;
     --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-headline: 'Bricolage Grotesque', sans-serif;
@@ -73,3 +81,42 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 /* Leaflet sits under our sticky UI */
 .leaflet-container { font-family: var(--font-body); background: #F0EAE0; }
+
+@keyframes pop-in {
+  0% { transform: scale(0.7) rotate(-4deg); opacity: 0; }
+  70% { transform: scale(1.05) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; }
+}
+
+
+/* Mascot animations */
+@keyframes mascot-bounce {
+  0% { transform: translateY(0) scale(1, 1); }
+  25% { transform: translateY(-9px) scale(0.92, 1.1); }
+  55% { transform: translateY(0) scale(1.15, 0.85); }
+  80% { transform: translateY(-3px) scale(1, 1); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+.mascot-bounce { display: inline-block; animation: mascot-bounce 0.55s ease-out; }
+
+@keyframes mascot-pop {
+  0% { transform: scale(1) rotate(0); }
+  40% { transform: scale(1.3) rotate(-12deg); }
+  70% { transform: scale(0.95) rotate(6deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.mascot-pop { display: inline-block; animation: mascot-pop 0.5s ease-out; }
+
+/* Mascot face markers on the map. --face-size follows the zoom level (set in NearbyMap) */
+.face-marker { position: relative; width: var(--face-size, 44px); height: var(--face-size, 44px); margin: calc(var(--face-size, 44px) / -2) 0 0 calc(var(--face-size, 44px) / -2); border-radius: 9999px; background: #fff; padding: max(2px, calc(var(--face-size, 44px) * 0.06)); box-shadow: 0 2px 8px rgba(24,17,26,.35); transition: width .2s ease, height .2s ease, margin .2s ease, transform .15s ease; cursor: pointer; }
+.face-marker img { width: 100%; height: 100%; border-radius: 9999px; display: block; }
+.face-marker:hover { transform: scale(1.15); }
+.face-marker.is-selected { transform: scale(1.3); box-shadow: 0 0 0 3px #FF4D94, 0 6px 16px rgba(24,17,26,.4); }
+.me-marker { position: relative; width: var(--me-size, 96px); height: var(--me-size, 96px); margin: calc(var(--me-size, 96px) / -2) 0 0 calc(var(--me-size, 96px) / -2); transition: width .2s ease, height .2s ease, margin .2s ease; }
+.me-marker .me-ring { position: absolute; inset: 0; border-radius: 9999px; background: rgba(204,255,0,.28); border: 1px solid rgba(24,17,26,.35); }
+.me-marker .me-core { position: absolute; inset: 29%; border-radius: 9999px; background: #CCFF00; border: 1px solid rgba(24,17,26,.5); display: flex; align-items: center; justify-content: center; font-family: Shrikhand, cursive; font-style: italic; color: #18111A; font-size: calc(var(--me-size, 96px) * 0.2); }
+.face-check { position: absolute; right: -4px; top: -4px; width: 20px; height: 20px; border-radius: 9999px; background: #9B004F; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }

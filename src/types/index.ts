@@ -71,6 +71,8 @@ export interface Beacon {
   priceCents?: number;
   visibility?: 'public' | 'friends' | 'private';
   capacity?: number | null; // null = unlimited
+  section?: 'tonight' | 'weekend'; // which home row a seeded event belongs to
+  tags?: string[]; // vibe keys: brunch, working-out, party, music, coffee
 }
 
 export interface FriendOrbit {

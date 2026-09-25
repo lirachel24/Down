@@ -77,7 +77,7 @@ export const DescriptionPage: React.FC<DescriptionPageProps> = ({ draft, onSave 
         onBack={save}
         right={
           <CircleButton label="Write a draft with AI" onClick={handleAi} disabled={drafting || !editor}>
-            {drafting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 text-pink" />}
+            {drafting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 text-cta" />}
           </CircleButton>
         }
       />
@@ -102,7 +102,7 @@ export const DescriptionPage: React.FC<DescriptionPageProps> = ({ draft, onSave 
               aria-pressed={t.active}
               onMouseDown={(e) => e.preventDefault()} // keep editor focus
               onClick={t.run}
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${t.active ? 'bg-ink text-lime' : 'text-ink hover:bg-sand'}`}
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-control ${t.active ? 'bg-cta text-cream' : 'text-ink hover:bg-sand'}`}
             >
               {t.icon}
             </button>
@@ -111,7 +111,7 @@ export const DescriptionPage: React.FC<DescriptionPageProps> = ({ draft, onSave 
         <button
           type="button"
           onClick={save}
-          className="mt-2 min-h-[48px] w-full rounded-full bg-ink text-base font-semibold text-lime active:scale-[0.98]"
+          className="mt-2 min-h-[48px] w-full rounded-full bg-lime text-base font-semibold text-ink active:scale-[0.98]"
         >
           Done
         </button>

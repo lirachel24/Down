@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
+import ical from 'node-ical';
 
 dotenv.config();
 
@@ -289,6 +290,225 @@ Tone: relatable, zero pressure, sweatpants are fine. Return ONLY simple HTML usi
     console.error('Gemini event-description error:', err);
     res.json({ html: fallback, fallback: true });
   }
+});
+
+
+// ---------- Chat (persisted to data/chat.json) ----------
+const CHAT_FILE = path.join(DATA_DIR, 'chat.json');
+interface ChatMessage {
+  id: string;
+  threadId: string;
+  from: 'me' | 'friend';
+  text: string;
+  ts: number;
+}
+interface ChatStore {
+  messages: ChatMessage[];
+  reads: Record<string, number>; // threadId -> timestamp the user last read up to
+}
+
+function readChat(): ChatStore {
+  try {
+    const data = JSON.parse(fs.readFileSync(CHAT_FILE, 'utf8'));
+    return { messages: data.messages ?? [], reads: data.reads ?? {} };
+  } catch {
+    return { messages: [], reads: {} };
+  }
+}
+
+function writeChat(store: ChatStore) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  store.messages = store.messages.slice(-2000);
+  fs.writeFileSync(CHAT_FILE, JSON.stringify(store, null, 2));
+}
+
+const validThread = (id: unknown): id is string => typeof id === 'string' && /^[a-z0-9-]{1,60}$/i.test(id);
+
+let lastTs = 0;
+const nextTs = () => (lastTs = Math.max(Date.now(), lastTs + 1)); // strictly increasing, so ordering is stable
+
+function addMessage(threadId: string, from: 'me' | 'friend', text: string): ChatMessage {
+  const store = readChat();
+  const msg: ChatMessage = { id: `m-${nextTs()}-${Math.random().toString(36).slice(2, 7)}`, threadId, from, text, ts: nextTs() };
+  store.messages.push(msg);
+  writeChat(store);
+  return msg;
+}
+
+// One summary per conversation: last message + unread count
+app.get('/api/threads', (_req, res) => {
+  const store = readChat();
+  const threads: Record<string, { last: ChatMessage; unread: number }> = {};
+  for (const m of store.messages) {
+    const cur = threads[m.threadId] ?? { last: m, unread: 0 };
+    cur.last = m;
+    if (m.from === 'friend' && m.ts > (store.reads[m.threadId] ?? 0)) cur.unread += 1;
+    threads[m.threadId] = cur;
+  }
+  res.json({ threads });
+});
+
+app.get('/api/messages', (req, res) => {
+  const threadId = req.query.thread;
+  if (!validThread(threadId)) return res.status(400).json({ error: 'Bad thread' });
+  res.json({ messages: readChat().messages.filter((m) => m.threadId === threadId) });
+});
+
+app.post('/api/messages', (req, res) => {
+  const { threadId, text } = req.body ?? {};
+  const clean = typeof text === 'string' ? text.trim() : '';
+  if (!validThread(threadId) || !clean || clean.length > 1000) return res.status(400).json({ error: 'Invalid message' });
+  res.json({ message: addMessage(threadId, 'me', clean) });
+});
+
+app.post('/api/messages/read', (req, res) => {
+  const { threadId } = req.body ?? {};
+  if (!validThread(threadId)) return res.status(400).json({ error: 'Bad thread' });
+  const store = readChat();
+  store.reads[threadId] = Date.now() + 1;
+  writeChat(store);
+  res.json({ ok: true });
+});
+
+// Demo helper: the mock friends are not real users, so this writes their side of the conversation
+const CANNED_REPLIES = [
+  'ha yes!! I am so down. what time?',
+  'omg perfect timing, I was just about to text you',
+  'I can do tonight, just say where and I will be there',
+  'lol you get me. count me in',
+  'ok yes, but only if there is a snack involved',
+  'thinking of you too! this week has been a lot, I need this',
+];
+
+app.post('/api/messages/auto-reply', async (req, res) => {
+  const { threadId, friendName, interests } = req.body ?? {};
+  if (!validThread(threadId)) return res.status(400).json({ error: 'Bad thread' });
+  const history = readChat().messages.filter((m) => m.threadId === threadId).slice(-8);
+  let text = CANNED_REPLIES[Math.floor(Math.random() * CANNED_REPLIES.length)];
+
+  if (aiClient) {
+    try {
+      const convo = history.map((m) => `${m.from === 'me' ? 'Kylie' : String(friendName || 'Friend')}: ${m.text}`).join('\n');
+      const response = await aiClient.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: `You are ${String(friendName || 'a friend').slice(0, 40)}, a warm, funny 20-something friend of Kylie texting her back. Shared interests: ${String(interests || 'coffee, walks').slice(0, 120)}.
+Recent messages:
+${convo}
+Reply with ONE short casual text message (max 25 words), lowercase-friendly, no quotes, no emojis unless natural. Return only the message text.`,
+      });
+      const out = (response.text || '').trim().replace(/^["']|["']$/g, '');
+      if (out) text = out.slice(0, 300);
+    } catch (err) {
+      console.error('Gemini friend reply error:', err);
+    }
+  }
+  res.json({ message: addMessage(threadId, 'friend', text) });
+});
+
+
+// ---------- Google Calendar (read-only, via the private iCal address) ----------
+const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
+
+function readSettings(): { calendarUrl?: string } {
+  try {
+    return JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function writeSettings(s: { calendarUrl?: string }) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(s, null, 2));
+}
+
+// Only Google Calendar's own iCal addresses are accepted, so the server can't be pointed at arbitrary hosts
+function parseCalendarUrl(raw: unknown): URL | null {
+  if (typeof raw !== 'string') return null;
+  try {
+    const u = new URL(raw.trim().replace(/^webcal:/i, 'https:'));
+    if (u.protocol !== 'https:' || u.hostname !== 'calendar.google.com' || !u.pathname.startsWith('/calendar/ical/')) return null;
+    return u;
+  } catch {
+    return null;
+  }
+}
+
+interface CalEvent {
+  title: string;
+  start: number;
+  end: number;
+}
+
+let calCache: { url: string; at: number; events: CalEvent[] } | null = null;
+
+async function loadCalendar(url: string, force = false): Promise<CalEvent[]> {
+  if (!force && calCache && calCache.url === url && Date.now() - calCache.at < 60_000) return calCache.events;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 10_000);
+  let text: string;
+  try {
+    const r = await fetch(url, { signal: ctrl.signal, redirect: 'error' });
+    if (!r.ok) throw new Error(`Google returned ${r.status}`);
+    text = await r.text();
+  } finally {
+    clearTimeout(timer);
+  }
+  if (text.length > 8_000_000) throw new Error('Calendar is too large');
+  if (!text.includes('BEGIN:VCALENDAR')) throw new Error('That address did not return a calendar');
+
+  const from = new Date(Date.now() - 12 * 3600_000);
+  const to = new Date(Date.now() + 7 * 24 * 3600_000);
+  const events: CalEvent[] = [];
+  for (const item of Object.values(ical.parseICS(text)) as any[]) {
+    if (!item || item.type !== 'VEVENT' || !item.start) continue;
+    const instances = item.rrule
+      ? ical.expandRecurringEvent(item, { from, to, expandOngoing: true })
+      : [{ start: item.start, end: item.end ?? item.start, summary: item.summary, isFullDay: item.datetype === 'date' }];
+    for (const inst of instances as any[]) {
+      const start = new Date(inst.start).getTime();
+      const end = new Date(inst.end ?? inst.start).getTime();
+      if (inst.isFullDay || end < from.getTime() || start > to.getTime()) continue; // all-day items don't block time
+      const title = typeof inst.summary === 'string' ? inst.summary : (inst.summary?.val ?? 'Busy');
+      events.push({ title: String(title).slice(0, 120), start, end });
+    }
+  }
+  events.sort((a, b) => a.start - b.start);
+  calCache = { url, at: Date.now(), events };
+  return events;
+}
+
+app.get('/api/calendar', async (_req, res) => {
+  const url = readSettings().calendarUrl;
+  if (!url) return res.json({ connected: false, events: [] });
+  try {
+    res.json({ connected: true, events: await loadCalendar(url) });
+  } catch (err: any) {
+    console.error('Calendar load error:', err?.message);
+    res.json({ connected: true, events: [], error: 'Could not read your calendar right now.' });
+  }
+});
+
+app.post('/api/calendar', async (req, res) => {
+  const u = parseCalendarUrl(req.body?.url);
+  if (!u) {
+    return res.status(400).json({ error: 'Paste the "Secret address in iCal format" from Google Calendar (it starts with https://calendar.google.com/calendar/ical/).' });
+  }
+  try {
+    const events = await loadCalendar(u.toString(), true);
+    writeSettings({ ...readSettings(), calendarUrl: u.toString() });
+    res.json({ connected: true, events });
+  } catch (err: any) {
+    res.status(400).json({ error: 'Could not read that calendar. Check the address and try again.' });
+  }
+});
+
+app.delete('/api/calendar', (_req, res) => {
+  const s = readSettings();
+  delete s.calendarUrl;
+  writeSettings(s);
+  calCache = null;
+  res.json({ connected: false });
 });
 
 // Vite middleware in dev or static files in production

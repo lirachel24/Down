@@ -4,14 +4,13 @@ import { Beacon } from '../../types';
 import { PageShell, CircleButton } from './ui';
 import { LocationMap } from './LocationMap';
 import { formatWhen } from '../../lib/format';
+import { eventLink } from '../../lib/calendar';
 
 interface SuccessPageProps {
   event: Beacon;
   onClose: () => void;
   onViewEvent: () => void;
 }
-
-export const eventLink = (id: string) => `${window.location.origin}/?event=${encodeURIComponent(id)}`;
 
 export const SuccessPage: React.FC<SuccessPageProps> = ({ event, onClose, onViewEvent }) => {
   const [note, setNote] = useState<string | null>(null);
@@ -62,14 +61,14 @@ export const SuccessPage: React.FC<SuccessPageProps> = ({ event, onClose, onView
         </div>
 
         {hasPin && (
-          <div className="mt-4 overflow-hidden rounded-3xl border border-line">
+          <div className="mt-4 overflow-hidden rounded-card border border-line">
             <LocationMap lat={event.lat!} lng={event.lng!} interactive={false} className="h-44 w-full" />
           </div>
         )}
 
         <div className="mt-auto flex flex-col gap-3 pt-8">
           {note && <p role="status" className="break-all text-center text-sm text-muted">{note}</p>}
-          <button type="button" onClick={onViewEvent} className="min-h-[56px] rounded-full bg-ink text-base font-semibold text-lime active:scale-[0.98]">
+          <button type="button" onClick={onViewEvent} className="min-h-[56px] rounded-full bg-cta text-base font-semibold text-cream active:scale-[0.98]">
             View Event Page
           </button>
           <button type="button" onClick={invite} className="min-h-[56px] rounded-full border border-line bg-white/80 text-base font-semibold text-ink active:scale-[0.98]">

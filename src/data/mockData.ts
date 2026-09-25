@@ -4,7 +4,7 @@ export const currentUser: UserProfile = {
   id: 'user-kylie',
   name: 'Kylie',
   handle: '@kylie',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+  avatar: '/avatar-kylie.jpg',
   bio: 'Part-time adult, full-time snack enthusiast',
   role: 'EECS Student & Creator',
   companyOrSchool: 'UC Berkeley',
@@ -40,6 +40,8 @@ export const initialBeacons: Beacon[] = [
     locationName: 'Blue Bottle Coffee · Shattuck Ave',
     address: '2118 Vine St, Berkeley',
     distance: '0.3 mi away',
+    lat: 37.8720713,
+    lng: -122.2676078,
     coords: { x: 38, y: 32 },
     startTime: Date.now() - 5 * 60 * 1000,
     durationMinutes: 40,
@@ -80,6 +82,8 @@ export const initialBeacons: Beacon[] = [
     locationName: 'Trader Joe\'s · University Ave',
     address: '1885 University Ave, Berkeley',
     distance: '0.5 mi away',
+    lat: 37.8687,
+    lng: -122.2662,
     coords: { x: 62, y: 48 },
     startTime: Date.now() - 2 * 60 * 1000,
     durationMinutes: 30,
@@ -120,6 +124,8 @@ export const initialBeacons: Beacon[] = [
     locationName: 'Willard Park Lawn',
     address: '2730 Hillegass Ave, Berkeley',
     distance: '0.4 mi away',
+    lat: 37.8578,
+    lng: -122.2588,
     coords: { x: 25, y: 68 },
     startTime: Date.now() - 8 * 60 * 1000,
     durationMinutes: 35,
@@ -165,6 +171,8 @@ export const initialBeacons: Beacon[] = [
     locationName: 'Mercer Co-working / Library',
     address: '2200 Bancroft Way, Berkeley',
     distance: '0.6 mi away',
+    lat: 37.8722,
+    lng: -122.2606,
     coords: { x: 74, y: 22 },
     startTime: Date.now() - 10 * 60 * 1000,
     durationMinutes: 45,
@@ -282,13 +290,17 @@ export const initialPendingVibeCheck: PendingVibeCheck = {
   depositStatus: 'holding',
 };
 
-export interface UpcomingEvent {
-  id: string;
-  title: string;
-  startsAt: number;
-  image?: string;
-}
+// ---------- Seeded events (real, joinable events that fill the home page and map) ----------
+const MIN = 60_000;
+const IMG = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=80`;
+const friendById = (id: string) => initialFriendOrbits.find((f) => f.id === id)!;
+const friendAttendee = (id: string) => {
+  const f = friendById(id);
+  return { id: f.id, name: f.name, avatar: f.avatar };
+};
 
+// Days until the coming Saturday (next weekend = the one after that)
+const daysToSaturday = (6 - new Date().getDay() + 7) % 7 || 7;
 const atHour = (daysFromNow: number, hour: number) => {
   const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
@@ -296,23 +308,121 @@ const atHour = (daysFromNow: number, hour: number) => {
   return d.getTime();
 };
 
-// Days until the coming Saturday (next weekend = the one after that)
-const daysToSaturday = (6 - new Date().getDay() + 7) % 7 || 7;
+const HOSTS = {
+  jess: { id: 'host-jess', name: 'Jess Park', avatar: IMG('1438761681033-6461ffad8d80'), role: 'Community host', companyOrSchool: 'Berkeley' },
+  marcus: { id: 'host-marcus', name: 'Marcus Bell', avatar: IMG('1500648767791-00dcc994a43e'), role: 'Community host', companyOrSchool: 'Berkeley' },
+};
 
-export const freeTonightEvents: UpcomingEvent[] = [
-  { id: 'tonight-1', title: 'Rooftop drinks', startsAt: atHour(0, 17), image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80' },
-  { id: 'tonight-2', title: 'Walk around the lake', startsAt: atHour(0, 18), image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80' },
-  { id: 'tonight-3', title: 'Lunch with friends', startsAt: atHour(0, 19), image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=800&q=80' },
-  { id: 'tonight-4', title: 'Wine night', startsAt: atHour(0, 19), image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=800&q=80' },
-  { id: 'tonight-5', title: 'Sunset hang on the hill', startsAt: atHour(0, 20), image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80' },
-  { id: 'tonight-6', title: 'Live music & drinks', startsAt: atHour(0, 21), image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=80' },
+interface SeedOpts {
+  id: string;
+  title: string;
+  image: string;
+  startsAt: number;
+  minutes: number;
+  place: string;
+  address: string;
+  lat: number;
+  lng: number;
+  section: 'tonight' | 'weekend';
+  friends: string[]; // friend ids who are going
+  host?: keyof typeof HOSTS;
+  reason: string;
+  wearing?: string;
+  capacity?: number;
+}
+
+function seedEvent(o: SeedOpts): Beacon {
+  const hostFriend = o.host ? null : o.friends[0] ? friendById(o.friends[0]) : null;
+  const host = hostFriend
+    ? { id: hostFriend.id, name: hostFriend.name, avatar: hostFriend.avatar, role: 'Friend', companyOrSchool: 'Berkeley' }
+    : HOSTS[o.host ?? 'jess'];
+  const attendees = [...(o.host || !hostFriend ? [{ id: host.id, name: host.name, avatar: host.avatar }] : []), ...o.friends.map(friendAttendee)];
+  const capacity = o.capacity ?? 8;
+  return {
+    id: o.id,
+    title: o.title,
+    author: { ...host, tier: 'orbit', sweatpantsApproved: true },
+    activityCategory: 'after-work',
+    categoryLabel: 'Hangout',
+    locationName: o.place,
+    address: o.address,
+    distance: '',
+    lat: o.lat,
+    lng: o.lng,
+    coords: { x: 50, y: 50 },
+    startTime: o.startsAt,
+    durationMinutes: o.minutes,
+    expiresAt: o.startsAt + o.minutes * MIN,
+    spotsTotal: capacity,
+    spotsFilled: attendees.length,
+    attendees,
+    whatAreWeWearing: o.wearing ?? 'Come as you are (sweatpants fully approved)',
+    convinceMeReason: o.reason,
+    icebreakerQuestions: [
+      "What's the funniest thing that went wrong with your week so far?",
+      'If you could teleport anywhere for one hour right now, where would you go?',
+      "What's a small win you haven't told anyone about yet?",
+    ],
+    depositRequired: true,
+    image: o.image,
+    section: o.section,
+    capacity,
+    priceCents: 0,
+    visibility: 'public',
+  };
+}
+
+const now = Date.now();
+const seeded: Beacon[] = [
+  seedEvent({ id: 'seed-rooftop', title: 'Rooftop drinks', image: IMG('1517457373958-b7bdd4587205'), startsAt: now + 50 * MIN, minutes: 90, place: 'Jupiter', address: '2181 Shattuck Ave, Berkeley', lat: 37.8697, lng: -122.2683, section: 'tonight', friends: ['friend-maya', 'friend-sam'], reason: 'Golden hour, good company and zero planning. One drink and you are home by nine feeling human again.' }),
+  seedEvent({ id: 'seed-lake', title: 'Walk around the lake', image: IMG('1529156069898-49953e39b3ac'), startsAt: now + 110 * MIN, minutes: 60, place: 'Aquatic Park', address: 'Aquatic Park, Berkeley', lat: 37.8635, lng: -122.2989, section: 'tonight', friends: ['friend-nicki'], reason: 'Twenty minutes of walking beats an hour of scrolling. Bring headphones or bring a friend.' }),
+  seedEvent({ id: 'seed-lunch', title: 'Lunch with friends', image: IMG('1517486808906-6ca8b3f04846'), startsAt: now + 170 * MIN, minutes: 75, place: 'Comal', address: '2020 Shattuck Ave, Berkeley', lat: 37.8713, lng: -122.2685, section: 'tonight', friends: ['friend-alyssa', 'friend-zain'], reason: 'You have been meaning to see these two for weeks. This is the low-effort way to finally do it.' }),
+  seedEvent({ id: 'seed-wine', title: 'Wine night', image: IMG('1519671482749-fd09be7ccebf'), startsAt: now + 230 * MIN, minutes: 120, place: 'Vintage Berkeley', address: '2113 Vine St, Berkeley', lat: 37.8809, lng: -122.2695, section: 'tonight', friends: [], host: 'marcus', reason: 'A small table, a good bottle, and people who are also just glad to be out of the house.' }),
+  seedEvent({ id: 'seed-hill', title: 'Sunset hang on the hill', image: IMG('1511632765486-a01980e01a18'), startsAt: now + 290 * MIN, minutes: 60, place: 'Indian Rock Park', address: 'Indian Rock Park, Berkeley', lat: 37.8925, lng: -122.2727, section: 'tonight', friends: ['friend-sam', 'friend-nicki'], reason: 'The best free view in the East Bay. Bring a layer and a snack.' }),
+  seedEvent({ id: 'seed-music', title: 'Live music & drinks', image: IMG('1470229722913-7c0e2dbbafd3'), startsAt: now + 350 * MIN, minutes: 150, place: 'Cornerstone Berkeley', address: '2367 Shattuck Ave, Berkeley', lat: 37.8664, lng: -122.2673, section: 'tonight', friends: [], host: 'jess', reason: 'Loud enough that nobody needs to make small talk. Come for the band, stay for whoever you meet.' }),
+
+  seedEvent({ id: 'seed-pool', title: 'Pool party', image: IMG('1523301343968-6a6ebf63c672'), startsAt: atHour(daysToSaturday + 7, 13), minutes: 180, place: 'Strawberry Canyon Rec Area', address: 'Strawberry Canyon, Berkeley', lat: 37.8757, lng: -122.2455, section: 'weekend', friends: ['friend-maya', 'friend-alyssa'], capacity: 20, reason: 'Sun, water and a playlist somebody actually curated. The easiest way to spend a Saturday.' }),
+  seedEvent({ id: 'seed-brunch', title: 'Brunch crawl', image: IMG('1528605105345-5344ea20e269'), startsAt: atHour(daysToSaturday + 8, 11), minutes: 150, place: 'Fourth Street', address: 'Fourth Street, Berkeley', lat: 37.8697, lng: -122.3018, section: 'weekend', friends: ['friend-zain'], capacity: 12, reason: 'Three stops, small plates, no commitment. Leave whenever you are full or done.' }),
+  seedEvent({ id: 'seed-thrift', title: 'Thrift & boba', image: IMG('1543807535-eceef0bc6599'), startsAt: atHour(daysToSaturday + 8, 14), minutes: 120, place: 'Telegraph Ave', address: 'Telegraph Ave, Berkeley', lat: 37.8656, lng: -122.2586, section: 'weekend', friends: ['friend-nicki'], reason: 'You need an outfit for that birthday anyway. Come with a budget, leave with a story.' }),
+  seedEvent({ id: 'seed-bday', title: 'Birthday party', image: IMG('1530103862676-de8c9debad1d'), startsAt: atHour(daysToSaturday + 7, 20), minutes: 180, place: 'Live Oak Park', address: 'Live Oak Park, Berkeley', lat: 37.8801, lng: -122.2693, section: 'weekend', friends: ['friend-maya', 'friend-sam', 'friend-alyssa'], capacity: 25, reason: 'Balloons, cake and half your friends in one place. You will not regret going.' }),
+  seedEvent({ id: 'seed-dinner', title: 'Dinner out', image: IMG('1528605248644-14dd04022da1'), startsAt: atHour(daysToSaturday + 7, 18), minutes: 120, place: 'Chez Panisse', address: '1517 Shattuck Ave, Berkeley', lat: 37.8796, lng: -122.2694, section: 'weekend', friends: [], host: 'marcus', capacity: 10, reason: 'A long table and a slow dinner. Worth getting dressed for, just this once.' }),
+  seedEvent({ id: 'seed-cowork', title: 'Co-working morning', image: IMG('1523240795612-9a054b0db644'), startsAt: atHour(daysToSaturday + 8, 9), minutes: 180, place: 'Caffe Strada', address: '2300 College Ave, Berkeley', lat: 37.8672, lng: -122.2545, section: 'weekend', friends: ['friend-zain', 'friend-alyssa'], reason: 'Body-double your to-do list with people who are also avoiding theirs.' }),
 ];
 
-export const nextWeekendEvents: UpcomingEvent[] = [
-  { id: 'weekend-1', title: 'Pool party', startsAt: atHour(daysToSaturday + 7, 13), image: 'https://images.unsplash.com/photo-1523301343968-6a6ebf63c672?auto=format&fit=crop&w=800&q=80' },
-  { id: 'weekend-2', title: 'Brunch crawl', startsAt: atHour(daysToSaturday + 8, 11), image: 'https://images.unsplash.com/photo-1528605105345-5344ea20e269?auto=format&fit=crop&w=800&q=80' },
-  { id: 'weekend-3', title: 'Thrift & boba', startsAt: atHour(daysToSaturday + 8, 14), image: 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?auto=format&fit=crop&w=800&q=80' },
-  { id: 'weekend-4', title: 'Birthday party', startsAt: atHour(daysToSaturday + 7, 20), image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=80' },
-  { id: 'weekend-5', title: 'Dinner out', startsAt: atHour(daysToSaturday + 7, 18), image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=800&q=80' },
-  { id: 'weekend-6', title: 'Co-working morning', startsAt: atHour(daysToSaturday + 8, 9), image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80' },
-];
+// Friends who are going to the four original events
+const addFriends = (beaconId: string, ids: string[]) => {
+  const b = initialBeacons.find((x) => x.id === beaconId);
+  if (!b) return;
+  ids.forEach((id) => {
+    if (!b.attendees.some((a) => a.id === id)) b.attendees.push(friendAttendee(id));
+  });
+  b.spotsTotal = Math.max(b.spotsTotal, b.attendees.length + 1);
+  b.spotsFilled = b.attendees.length;
+};
+addFriends('beacon-2', ['friend-maya']);
+addFriends('beacon-3', ['friend-nicki', 'friend-sam']);
+addFriends('beacon-4', ['friend-zain']);
+
+initialBeacons.push(...seeded);
+
+// Which vibe filter each seeded event belongs to (an event can fit more than one)
+const TAGS_BY_ID: Record<string, string[]> = {
+  'beacon-1': ['coffee'],
+  'beacon-3': ['working-out'],
+  'beacon-4': ['coffee'],
+  'seed-rooftop': ['party', 'music'],
+  'seed-lake': ['working-out'],
+  'seed-lunch': ['brunch'],
+  'seed-wine': ['brunch'],
+  'seed-hill': ['working-out'],
+  'seed-music': ['music'],
+  'seed-pool': ['party', 'music'],
+  'seed-brunch': ['brunch'],
+  'seed-thrift': ['coffee'],
+  'seed-bday': ['party'],
+  'seed-dinner': ['brunch'],
+  'seed-cowork': ['coffee'],
+};
+initialBeacons.forEach((b) => {
+  if (TAGS_BY_ID[b.id]) b.tags = TAGS_BY_ID[b.id];
+});

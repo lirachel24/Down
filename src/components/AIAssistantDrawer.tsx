@@ -81,12 +81,12 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
       aria-labelledby="ai-drawer-title"
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
     >
-      <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-line shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col animate-in slide-in-from-bottom duration-200">
+      <div className="bg-white w-full max-w-lg rounded-t-card sm:rounded-card border border-line shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col animate-in slide-in-from-bottom duration-200">
         <div className="w-12 h-1.5 bg-neutral-300 rounded-full mx-auto my-3 sm:hidden" />
 
         <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-line">
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-[#CCFF00] text-[#18111A]">
+            <span className="p-2 rounded-control bg-sand text-ink">
               <Brain className="w-5 h-5" />
             </span>
             <div>
@@ -116,9 +116,9 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
                 setOutputResult(null);
                 setIcebreakerList([]);
               }}
-              className={`min-h-[44px] p-2 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
+              className={`min-h-[44px] p-2 text-xs font-bold rounded-control flex items-center justify-center gap-1 transition-all ${
                 promptMode === 'pep-talk'
-                  ? 'bg-[#18111A] text-[#CCFF00] shadow-xs'
+                  ? 'bg-cta text-cream shadow-xs'
                   : 'bg-white text-neutral-600 border border-line hover:bg-sand'
               }`}
             >
@@ -131,9 +131,9 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
                 setOutputResult(null);
                 setIcebreakerList([]);
               }}
-              className={`min-h-[44px] p-2 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
+              className={`min-h-[44px] p-2 text-xs font-bold rounded-control flex items-center justify-center gap-1 transition-all ${
                 promptMode === 'icebreakers'
-                  ? 'bg-[#18111A] text-[#CCFF00] shadow-xs'
+                  ? 'bg-cta text-cream shadow-xs'
                   : 'bg-white text-neutral-600 border border-line hover:bg-sand'
               }`}
             >
@@ -146,9 +146,9 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
                 setOutputResult(null);
                 setIcebreakerList([]);
               }}
-              className={`min-h-[44px] p-2 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
+              className={`min-h-[44px] p-2 text-xs font-bold rounded-control flex items-center justify-center gap-1 transition-all ${
                 promptMode === 'outfit'
-                  ? 'bg-[#18111A] text-[#CCFF00] shadow-xs'
+                  ? 'bg-cta text-cream shadow-xs'
                   : 'bg-white text-neutral-600 border border-line hover:bg-sand'
               }`}
             >
@@ -178,12 +178,12 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
                     ? "Boba run + discussing friend's birthday party outfit"
                     : "Sweatpants and an oversized UC Berkeley hoodie"
                 }
-                className="flex-1 min-h-[44px] px-3.5 rounded-xl bg-white border border-line text-xs text-[#18111A] focus:outline-none focus:border-[#CCFF00]"
+                className="flex-1 min-h-[44px] px-3.5 rounded-control bg-white border border-line text-xs text-[#18111A] focus:outline-none focus:border-[#CCFF00]"
               />
               <button
                 onClick={handleGenerate}
                 disabled={loading}
-                className="min-h-[44px] px-4 rounded-xl bg-[#18111A] hover:bg-neutral-800 text-[#CCFF00] font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                className="min-h-[44px] px-4 rounded-control bg-cta hover:opacity-90 text-cream font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -197,7 +197,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
 
           {/* Results Output */}
           {loading && (
-            <div className="p-6 bg-sand rounded-2xl border border-line flex flex-col items-center justify-center gap-2">
+            <div className="p-6 bg-sand rounded-control border border-line flex flex-col items-center justify-center gap-2">
               <Loader2 className="w-6 h-6 text-[#9B004F] animate-spin" />
               <span className="text-xs font-bold text-neutral-600">
                 Analyzing behavioral dopamine circuits...
@@ -206,7 +206,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
           )}
 
           {outputResult && !loading && (
-            <div className="p-4 bg-sand rounded-2xl border border-line shadow-xs flex flex-col gap-2">
+            <div className="p-4 bg-sand rounded-card border border-line shadow-xs flex flex-col gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#9B004F]">
                 Voice of Reason
               </span>
@@ -224,7 +224,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
               {icebreakerList.map((q, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-white rounded-xl border border-line text-xs font-semibold text-[#18111A]"
+                  className="p-3 bg-white rounded-control border border-line text-xs font-semibold text-[#18111A]"
                 >
                   "{q}"
                 </div>

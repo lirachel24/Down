@@ -1,13 +1,19 @@
-import React from 'react';
-import { ArrowLeft, CalendarDays, CheckCircle2, Clock, Instagram, MapPin, Ticket } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, CalendarCheck, CalendarDays, ChevronRight, CheckCircle2, Clock, Instagram, MapPin, Ticket } from 'lucide-react';
 import { Beacon, UserProfile } from '../types';
 import { formatWhen } from '../lib/format';
+import { HiddenMascot, MascotFace } from './Mascot';
+import { ConnectCalendarSheet } from './ConnectCalendarSheet';
+import { HIDDEN_MASCOT_IDS, useFoundMascots } from '../lib/mascots';
 
 interface ProfileViewProps {
   user: UserProfile;
   beacons: Beacon[];
   onBack: () => void;
   onSelectBeacon: (beacon: Beacon) => void;
+  calendarConnected: boolean;
+  onConnectCalendar: (url: string) => Promise<void>;
+  onDisconnectCalendar: () => Promise<void>;
   }
 
 const EventRow: React.FC<{ beacon: Beacon; onSelect: (b: Beacon) => void; past?: boolean }> = ({ beacon, onSelect, past }) => (
@@ -16,7 +22,7 @@ const EventRow: React.FC<{ beacon: Beacon; onSelect: (b: Beacon) => void; past?:
     className="flex w-full items-center gap-4 py-3 text-left active:opacity-70"
     aria-label={`${beacon.title}, ${formatWhen(beacon.startTime)}`}
   >
-    <img src={beacon.image} alt="" className={`h-[88px] w-[88px] shrink-0 rounded-2xl object-cover ${past ? 'grayscale opacity-80' : ''}`} />
+    <img src={beacon.image} alt="" className={`h-[88px] w-[88px] shrink-0 rounded-control object-cover ${past ? 'grayscale opacity-80' : ''}`} />
     <span className="min-w-0">
       <span className="block truncate font-headline text-lg font-bold text-ink">{beacon.title}</span>
       <span className="mt-1 flex items-center gap-1.5 text-sm text-muted">
@@ -31,7 +37,9 @@ const EventRow: React.FC<{ beacon: Beacon; onSelect: (b: Beacon) => void; past?:
   </button>
 );
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ user, beacons, onBack, onSelectBeacon }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ user, beacons, onBack, onSelectBeacon, calendarConnected, onConnectCalendar, onDisconnectCalendar }) => {
+  const [calendarSheet, setCalendarSheet] = useState(false);
+  const { found, total } = useFoundMascots();
   const now = Date.now();
   const hosted = beacons.filter((b) => b.author.id === user.id);
   const hosting = hosted.filter((b) => b.expiresAt > now).sort((a, b) => a.startTime - b.startTime);
@@ -39,7 +47,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, beacons, onBack,
   const attendedCount = beacons.filter((b) => b.joined && b.author.id !== user.id).length;
 
   return (
-    <div className="pb-32">
+    <div className="relative pb-32">
+      <HiddenMascot id="profile-corner" color="green" message="Hi Kylie. You look great today." className="right-3 top-24" size={48} tilt={12} />
       <div className="px-4 pt-4">
         <button
           onClick={onBack}
@@ -72,7 +81,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, beacons, onBack,
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
-                className="flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-white/70 text-muted"
+                className="flex h-11 w-11 items-center justify-center rounded-control border border-line bg-white/70 text-muted"
               >
                 <Instagram className="h-5 w-5" />
               </a>
@@ -83,7 +92,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, beacons, onBack,
                 target="_blank"
                 rel="noreferrer"
                 aria-label="X"
-                className="flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-white/70 font-headline text-lg font-bold text-muted"
+                className="flex h-11 w-11 items-center justify-center rounded-control border border-line bg-white/70 font-headline text-lg font-bold text-muted"
               >
                 𝕏
               </a>
@@ -130,12 +139,44 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, beacons, onBack,
 
       <div className="border-t border-line" />
 
+      {/* Hidden mascots found */}
+      <section className="px-5 pt-6" aria-label="Hidden mascots">
+        <h2 className="font-headline text-2xl font-bold text-ink">Hidden mascots</h2>
+        <p className="mt-1 text-base text-muted">
+          {found.filter((id) => (HIDDEN_MASCOT_IDS as readonly string[]).includes(id)).length} of {total} found. They are tucked away all over the app. Tap one when you spot it.
+        </p>
+        <div className="mt-3 flex gap-2" role="list">
+          {HIDDEN_MASCOT_IDS.map((id, i) => (
+            <span role="listitem" key={id} aria-label={found.includes(id) ? 'Found' : 'Not found yet'}>
+              {found.includes(id) ? (
+                <MascotFace color={i % 2 ? 'green' : 'pink'} size={40} />
+              ) : (
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-line bg-sand text-lg text-muted">?</span>
+              )}
+            </span>
+          ))}
+        </div>
+      </section>
+
       {/* Preferences */}
       <section className="flex flex-col gap-5 px-5 pt-6" aria-label="Preferences">
         <h2 className="font-headline text-2xl font-bold text-ink">Preferences</h2>
 
+        <button
+          type="button"
+          onClick={() => setCalendarSheet(true)}
+          className="flex min-h-[64px] items-center gap-4 rounded-card border border-line bg-white/70 px-5 py-3 text-left active:opacity-70"
+        >
+          <CalendarCheck className="h-6 w-6 shrink-0 text-berry" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-base text-ink">Google Calendar</span>
+            <span className="block text-sm text-muted">{calendarConnected ? 'Connected. Tells you how much free time you have.' : 'Connect to see how much free time you have.'}</span>
+          </span>
+          <ChevronRight className="h-5 w-5 shrink-0 text-muted" />
+        </button>
+
       {/* Anti-Flake Deposit Account Balance */}
-      <div className="bg-white rounded-3xl p-5 border border-line shadow-xs flex flex-col gap-3">
+      <div className="bg-white rounded-card p-5 border border-line shadow-xs flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-[#9B004F]" />
@@ -143,23 +184,26 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, beacons, onBack,
               Accountability Ledger
             </h3>
           </div>
-          <span className="text-[10px] font-bold bg-[#CCFF00] text-[#18111A] px-2.5 py-0.5 rounded-full">
+          <span className="text-[10px] font-bold bg-sand text-ink px-2.5 py-0.5 rounded-full">
             $5 Refund Model
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-1">
-          <div className="p-3 bg-sand rounded-2xl border border-line">
+          <div className="p-3 bg-sand rounded-control border border-line">
             <span className="text-[11px] text-neutral-600 block">Refunded on Arrival</span>
             <span className="text-xl font-mono font-bold text-[#9B004F]">$25.00</span>
           </div>
-          <div className="p-3 bg-sand rounded-2xl border border-line">
+          <div className="p-3 bg-sand rounded-control border border-line">
             <span className="text-[11px] text-neutral-600 block">Active Held Deposits</span>
             <span className="text-xl font-mono font-bold text-[#18111A]">$5.00</span>
           </div>
         </div>
       </div>
       </section>
+      {calendarSheet && (
+        <ConnectCalendarSheet connected={calendarConnected} onConnect={onConnectCalendar} onDisconnect={onDisconnectCalendar} onClose={() => setCalendarSheet(false)} />
+      )}
     </div>
   );
 };

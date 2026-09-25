@@ -4,6 +4,7 @@ import { EventDraft } from './types';
 import { Card, CircleButton, Divider, PageHeader, PageShell, SectionLabel, Toggle } from './ui';
 import { fileToCoverDataUrl, formatPrice, formatWhen, htmlToText } from '../../lib/format';
 import { WheelDateTimePicker } from './WheelDateTimePicker';
+import { MascotFace, HiddenMascot } from '../Mascot';
 
 // Stable remote URLs (not bundler paths) so covers saved with an event keep working after a rebuild
 export const COVERS = [
@@ -59,15 +60,15 @@ const DateTimeRow: React.FC<{
         aria-label={`${label}: ${formatWhen(value)}. Change ${label.toLowerCase()} time`}
         className="flex min-h-[56px] w-full items-center gap-4 px-5 text-left"
       >
-        <span className={`h-3 w-3 shrink-0 rounded-full border-2 border-ink ${dot === 'filled' ? 'bg-ink' : 'bg-transparent'}`} />
+        <MascotFace color={dot === 'filled' ? 'pink' : 'green'} size={22} interactive={false} />
         <span className="flex-1 text-base text-muted">{label}</span>
-        <span className={`rounded-xl px-3 py-1.5 text-base text-ink transition-colors ${open ? 'bg-pink/15' : 'bg-sand'}`}>{formatWhen(value)}</span>
+        <span className={`rounded-control px-3 py-1.5 text-base text-ink transition-colors ${open ? 'bg-pink/15' : 'bg-sand'}`}>{formatWhen(value)}</span>
       </button>
       {open && (
         <div
           role="dialog"
           aria-label={`Pick ${label.toLowerCase()} date and time`}
-          className="absolute right-3 top-full z-40 mt-1 w-[min(340px,calc(100%-24px))] rounded-[28px] border border-line bg-white shadow-[0_20px_50px_-12px_rgba(24,17,26,0.35)]"
+          className="absolute right-3 top-full z-40 mt-1 w-[min(340px,calc(100%-24px))] rounded-card border border-line bg-white shadow-[0_20px_50px_-12px_rgba(24,17,26,0.35)]"
         >
           <WheelDateTimePicker value={value} onChange={onChange} />
         </div>
@@ -89,7 +90,7 @@ const SelectRow: React.FC<{
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="max-w-[45%] cursor-pointer rounded-lg bg-transparent py-2 pl-2 text-right text-base text-ink focus:outline-none"
+      className="max-w-[45%] cursor-pointer rounded-control bg-transparent py-2 pl-2 text-right text-base text-ink focus:outline-none"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>
@@ -140,7 +141,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({
         onBack={onClose}
         backIcon="close"
         right={
-          <CircleButton label="Create event" variant="ink" onClick={onSubmit} disabled={submitting}>
+          <CircleButton label="Create event" variant="cta" onClick={onSubmit} disabled={submitting}>
             {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5 stroke-[2.5]" />}
           </CircleButton>
         }
@@ -149,7 +150,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({
       <div className="flex-1 overflow-y-auto px-4 pb-10">
         {/* Cover */}
         <div className="mx-auto w-[64%]">
-          <div className="relative aspect-square overflow-hidden rounded-3xl border border-line bg-sand shadow-[0_10px_30px_-12px_rgba(24,17,26,0.35)]">
+          <div className="relative aspect-square overflow-hidden rounded-card border border-line bg-sand shadow-[0_10px_30px_-12px_rgba(24,17,26,0.35)]">
             <img src={draft.cover} alt="Event cover" className="h-full w-full object-cover" />
             <button
               type="button"
@@ -169,7 +170,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({
                 aria-label={`Use preset cover ${i + 1}`}
                 aria-pressed={draft.cover === src}
                 onClick={() => update({ cover: src })}
-                className={`h-11 w-11 overflow-hidden rounded-xl border-2 ${draft.cover === src ? 'border-pink' : 'border-transparent'}`}
+                className={`h-11 w-11 overflow-hidden rounded-control border-2 ${draft.cover === src ? 'border-pink' : 'border-transparent'}`}
               >
                 <img src={src} alt="" className="h-full w-full object-cover" />
               </button>
@@ -191,14 +192,14 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({
               placeholder="Event Name"
               aria-invalid={!!errors.title}
               aria-describedby={errors.title ? 'err-title' : undefined}
-              className="min-h-[64px] w-full rounded-3xl border border-line bg-white/70 px-5 font-headline text-2xl font-bold text-ink placeholder:text-ink/30 focus:outline-none focus:border-pink/40 focus:ring-4 focus:ring-pink/10"
+              className="min-h-[64px] w-full rounded-control border border-line bg-white/70 px-5 font-headline text-2xl font-bold text-ink placeholder:text-ink/30 focus:outline-none focus:border-pink/40 focus:ring-4 focus:ring-pink/10"
             />
             {errors.title && <p id="err-title" role="alert" className="mt-1.5 px-2 text-sm text-berry">{errors.title}</p>}
           </div>
 
           {/* Start / End */}
           <div>
-            <div className="relative z-20 rounded-3xl border border-line bg-white/70 py-1 backdrop-blur-md">
+            <div className="relative z-20 rounded-card border border-line bg-white/70 py-1 backdrop-blur-md">
               <DateTimeRow label="Start" value={draft.start} onChange={setStart} dot="filled" />
               <div className="ml-14 h-px bg-line" />
               <DateTimeRow label="End" value={draft.end} onChange={(end) => update({ end })} dot="hollow" />
@@ -210,7 +211,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({
           <div>
             <Card>
               <button type="button" onClick={onOpenLocation} className="flex min-h-[56px] w-full items-center gap-4 px-5 py-3 text-left">
-                <MapPin className="h-5 w-5 shrink-0 text-pink" />
+                <MapPin className="h-5 w-5 shrink-0 text-cta" />
                 {draft.place ? (
                   <span className="min-w-0">
                     <span className="block truncate text-base text-ink">{draft.place.name}</span>
@@ -263,7 +264,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({
                   type="button"
                   aria-pressed={draft.priceCents === 0}
                   onClick={() => update({ priceCents: 0 })}
-                  className={`min-h-[44px] rounded-full px-5 text-sm font-semibold ${draft.priceCents === 0 ? 'bg-ink text-lime' : 'border border-line bg-white text-ink'}`}
+                  className={`min-h-[44px] rounded-full px-5 text-sm font-semibold ${draft.priceCents === 0 ? 'bg-cta text-cream' : 'border border-line bg-white text-ink'}`}
                 >
                   Free
                 </button>
@@ -317,11 +318,15 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({
             type="button"
             onClick={onSubmit}
             disabled={submitting}
-            className="mt-2 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-ink text-base font-semibold text-lime active:scale-[0.98] disabled:opacity-60"
+            className="mt-2 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-lime text-base font-semibold text-ink active:scale-[0.98] disabled:opacity-60"
           >
-            {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Play className="h-4 w-4 fill-lime" />}
+            {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Play className="h-4 w-4 fill-ink" />}
             <span>{submitting ? 'Creating…' : 'Create Event'}</span>
           </button>
+
+          <div className="relative h-14">
+            <HiddenMascot id="create-form" color="pink" message="Great plans start with one tap." className="right-6 top-1" size={44} tilt={-8} />
+          </div>
         </div>
       </div>
     </PageShell>

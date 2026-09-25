@@ -57,7 +57,7 @@ const WheelColumn: React.FC<WheelColumnProps> = ({ label, items, index, onChange
       aria-activedescendant={`${label}-${index}`}
       onScroll={handleScroll}
       onKeyDown={handleKey}
-      className={`no-scrollbar snap-y snap-mandatory overflow-y-auto rounded-xl focus-visible:bg-ink/5 focus-visible:outline-none ${className}`}
+      className={`no-scrollbar snap-y snap-mandatory overflow-y-auto rounded-control focus-visible:bg-ink/5 focus-visible:outline-none ${className}`}
       style={{
         height: HEIGHT,
         maskImage: 'linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%)',
@@ -133,7 +133,7 @@ export const WheelDateTimePicker: React.FC<WheelDateTimePickerProps> = ({ value,
   return (
     <div className="relative px-3 py-2">
       {/* Selection band behind the middle row */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-3 top-1/2 -translate-y-1/2 rounded-xl bg-ink/[0.07]" style={{ height: ITEM }} />
+      <div aria-hidden className="pointer-events-none absolute inset-x-3 top-1/2 -translate-y-1/2 rounded-control bg-ink/[0.07]" style={{ height: ITEM }} />
       <div className="relative flex">
         <WheelColumn label="Day" items={dayItems} index={dayIndex} onChange={(i) => emit({ day: i })} className="flex-[2.4]" align="left" />
         <WheelColumn label="Hour" items={hourItems} index={hour12 - 1} onChange={(i) => emit({ hour12: i + 1 })} className="flex-1" />

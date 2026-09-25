@@ -1,14 +1,12 @@
 import React from 'react';
 import { ArrowLeft, X } from 'lucide-react';
+import { GradientBackdrop } from '../GradientBackdrop';
 
 // Full-screen page that sits over the app, like a Luma sheet
 export const PageShell: React.FC<{ children: React.ReactNode; label: string }> = ({ children, label }) => (
   <div role="dialog" aria-modal="true" aria-label={label} className="fixed inset-0 z-50 flex justify-center bg-ink/40">
-    <div className="relative flex h-full w-full max-w-[420px] flex-col overflow-clip bg-cream">
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#EBE7A8] opacity-70 blur-3xl" />
-        <div className="absolute -right-16 top-6 h-52 w-52 rounded-full bg-[#E8A4C8] opacity-60 blur-3xl" />
-      </div>
+    <div data-app-frame="" className="relative flex h-full w-full max-w-[420px] flex-col overflow-clip bg-cream">
+      <GradientBackdrop />
       <div className="relative flex h-full flex-col">{children}</div>
     </div>
   </div>
@@ -18,7 +16,7 @@ export const CircleButton: React.FC<{
   label: string;
   onClick: () => void;
   children: React.ReactNode;
-  variant?: 'plain' | 'ink';
+  variant?: 'plain' | 'cta' | 'lime';
   disabled?: boolean;
 }> = ({ label, onClick, children, variant = 'plain', disabled }) => (
   <button
@@ -27,7 +25,7 @@ export const CircleButton: React.FC<{
     onClick={onClick}
     disabled={disabled}
     className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-transform active:scale-95 disabled:opacity-40 ${
-      variant === 'ink' ? 'border-ink bg-ink text-lime' : 'border-line bg-white/80 text-ink'
+      variant === 'cta' ? 'border-cta bg-cta text-cream' : variant === 'lime' ? 'border-lime bg-lime text-ink' : 'border-line bg-white/80 text-ink'
     }`}
   >
     {children}
@@ -50,7 +48,7 @@ export const PageHeader: React.FC<{
 );
 
 export const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`overflow-hidden rounded-3xl border border-line bg-white/70 backdrop-blur-md ${className}`}>{children}</div>
+  <div className={`overflow-hidden rounded-card border border-line bg-white/70 backdrop-blur-md ${className}`}>{children}</div>
 );
 
 export const Divider = () => <div className="ml-14 h-px bg-line" />;
